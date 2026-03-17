@@ -1022,7 +1022,7 @@ function exportCSV() {
   if (!pts.length) { toast("No records to export"); return; }
   const h = ["PID","Name","Age","Gender","Guardian","Contact","Ward","Admission","Discharge","Diagnosis","Doctor","Subtotal","Discount","Total","Paid","Balance","Payment","Date"];
   const rows = pts.map(p => [p.pid,p.name,p.age,p.gender,p.guardian,p.contact,p.ward,p.admit,p.discharge,p.diag,p.doctor,p.subtotal,p.discAmt,p.total,p.paid||0,p.balance||0,p.payMode,p.date]);
-  const csv = [h,...rows].map(r=>r.map(c=>'"'+(c||"").toString().replace(/"/g,"\"\"")+ '"').join(",")).join("\n");
+  const csv = [h,...rows].map(r => r.map(c => `"${(c||"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
   a.download = "CHW_Patients_" + todayStr() + ".csv";
@@ -1036,7 +1036,7 @@ function exportAdminCSV() {
   if (!pts.length) { toast("No records"); return; }
   const h = ["PID","Name","Age","Gender","Guardian","Contact","Ward","Admission","Discharge","Diagnosis","Doctor","Subtotal","Discount","Total","Paid","Balance","Payment","Date"];
   const rows = pts.map(p => [p.pid,p.name,p.age,p.gender,p.guardian,p.contact,p.ward,p.admit,p.discharge,p.diag,p.doctor,p.subtotal,p.discAmt,p.total,p.paid||0,p.balance||0,p.payMode,p.date]);
-  const csv = [h,...rows].map(r=>r.map(c=>'"'+(c||"").toString().replace(/"/g,"\"\"")+ '"').join(",")).join("\n");
+  const csv = [h,...rows].map(r => r.map(c => `"${(c||"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
   a.download = "CHW_ALL_Patients_" + todayStr() + ".csv";
