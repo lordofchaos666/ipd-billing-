@@ -110,6 +110,17 @@
   #toast.show{transform:translateX(-50%) translateY(0)}
   @media print{body *{visibility:hidden}#print-area,#print-area *{visibility:visible}#print-area{position:fixed;top:0;left:0;width:100%}}
   @media(max-width:768px){.form-grid,.form-grid-3,.form-grid-4{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.charges-grid{grid-template-columns:1fr}header{padding:0 14px}.app{padding:14px 10px 60px}.card{padding:16px 14px}.receipt-info-grid{grid-column:1fr}}
+  #login-screen{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center}
+  .login-box{background:white;border-radius:20px;padding:44px 44px;max-width:380px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,0.4);text-align:center}
+  .login-logo{width:62px;height:62px;background:var(--teal-mid);border-radius:16px;display:grid;place-items:center;font-size:28px;margin:0 auto 18px}
+  .login-title{font-family:'DM Serif Display',serif;font-size:1.55rem;color:var(--navy);margin-bottom:4px}
+  .login-sub{font-size:.8rem;color:var(--muted);margin-bottom:26px}
+  .login-input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;text-align:center;letter-spacing:.1em;outline:none;transition:border-color .2s;box-sizing:border-box}
+  .login-input:focus{border-color:var(--teal-mid);box-shadow:0 0 0 3px rgba(13,125,107,.1)}
+  .login-btn{width:100%;margin-top:12px;padding:13px;background:var(--navy);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.93rem;font-weight:600;cursor:pointer;transition:all .2s}
+  .login-btn:hover{background:#1a3f60}
+  .login-err{display:none;margin-top:10px;background:#fff0f0;border:1px solid #e74c3c;border-radius:8px;padding:9px;font-size:.78rem;color:#c0392b}
+  .login-note{margin-top:14px;font-size:.7rem;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -121,8 +132,24 @@
       <div class="header-sub">Billing Management System</div>
     </div>
   </div>
-  <div class="header-time" id="clock"></div>
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="header-time" id="clock"></div>
+    <button onclick="logout()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#8fa6bf;padding:6px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.75rem;cursor:pointer" title="Log out">⏏ Logout</button>
+  </div>
 </header>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🏥</div>
+    <div class="login-title">Chandrawati Hospital</div>
+    <div class="login-sub">Billing System — Enter access password to continue</div>
+    <input type="password" id="login-pass" class="login-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Unlock &amp; Sync →</button>
+    <div class="login-err" id="login-err">Incorrect password. Try again.</div>
+    <div class="login-note">🔒 Stay logged in on this device permanently</div>
+  </div>
+</div>
 
 <div class="app">
   <div class="stats-row">
@@ -394,10 +421,38 @@
 <script>
 // ── FIREBASE REST API (no SDK needed) ─────────────────────────────────────
 const FB = 'https://ipd-billing-default-rtdb.asia-southeast1.firebasedatabase.app';
+const APP_PASS = 'chandrawati2025'; // ← change this password
 let patients = [];
 let billCount = 0;
 let totalRevenue = 0;
 let pollTimer = null;
+
+// ── LOGIN ──────────────────────────────────────────────────────────────────
+function doLogin(){
+  const p=document.getElementById('login-pass').value;
+  if(p===APP_PASS){
+    localStorage.setItem('chw_auth','1');
+    document.getElementById('login-screen').style.display='none';
+    startApp();
+  }else{
+    document.getElementById('login-err').style.display='block';
+    document.getElementById('login-pass').value='';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+function checkLogin(){
+  if(localStorage.getItem('chw_auth')==='1'){
+    document.getElementById('login-screen').style.display='none';
+    startApp();
+  }
+  // else login screen stays visible
+}
+
+function logout(){
+  localStorage.removeItem('chw_auth');
+  location.reload();
+}
 
 function setSyncBadge(state){
   const dot=document.getElementById('sync-dot');
@@ -473,10 +528,15 @@ setInterval(updateClock,1000);updateClock();
 
 function generatePID(){const d=new Date(),yy=String(d.getFullYear()).slice(-2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'),seq=String(patients.length+1).padStart(4,'0');return`CHW-${yy}${mm}${dd}-${seq}`}
 
-function init(){
+function startApp(){
   document.getElementById('p-admit').value=new Date().toISOString().split('T')[0];
   document.getElementById('pid-display').textContent='CHW-—';
+  updateStats();renderPatientTable();
   startPolling();
+}
+
+function init(){
+  checkLogin();
 }
 init();
 
