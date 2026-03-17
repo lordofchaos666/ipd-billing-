@@ -136,6 +136,18 @@ input:disabled{background:#eaecef;color:#aaa;cursor:not-allowed}
 .rtotal-lbl{font-size:.8rem;color:#8fa6bf}
 .rtotal-amt{font-family:"JetBrains Mono",monospace;font-size:1.4rem;font-weight:700}
 .rbal{background:#fff3cd;border:1px solid #ffc107;border-radius:9px;padding:10px 16px;margin-top:10px;display:none;justify-content:space-between;align-items:center}
+/* EDIT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:8888;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:16px;padding:28px 30px;max-width:860px;width:100%;margin:auto;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.modal-title{font-family:"DM Serif Display",serif;font-size:1.2rem;color:var(--navy);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:1px solid var(--border);border-radius:8px;padding:5px 12px;cursor:pointer;font-size:.8rem;color:var(--muted)}
+.adv-box{background:#e8f5e9;border:1.5px solid #4caf50;border-radius:10px;padding:14px 18px;margin-top:12px}
+.adv-title{font-size:.75rem;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+/* CUSTOM CHARGE ROW */
+.custom-row{display:grid;grid-template-columns:1fr 80px 90px 34px;gap:8px;align-items:center;margin-bottom:7px}
+.custom-row input{margin:0}
+.del-btn{width:34px;height:34px;background:var(--red);color:#fff;border:none;border-radius:7px;cursor:pointer;font-size:14px;display:grid;place-items:center}
 .rf{background:var(--s2);padding:10px 28px;text-align:center;font-size:.7rem;color:var(--muted);border-top:1px solid var(--border)}
 
 /* ADMIN */
@@ -305,7 +317,14 @@ input:disabled{background:#eaecef;color:#aaa;cursor:not-allowed}
         <div class="fi"><label>Discount (%)</label><input type="number" id="discount" min="0" max="100" value="0" oninput="recalc()"></div>
         <div class="fi"><label>Discount Reason</label><input id="disc-rsn" placeholder="BPL / Staff / Referral"></div>
         <div class="fi"><label>Payment Mode</label><select id="pay-mode"><option>Cash</option><option>UPI</option><option>Card</option><option>Insurance</option><option>Part-payment</option><option>Cashless/PMJAY</option></select></div>
-        <div class="fi"><label>Amount Paid (₹)</label><input type="number" id="amt-paid" min="0" value="0" oninput="recalc()"></div>
+        <div class="fi"><label>Amount Paid Now (₹)</label><input type="number" id="amt-paid" min="0" value="0" oninput="recalc()"></div>
+      </div>
+      <div class="adv-box">
+        <div class="adv-title">💰 Advance Payment</div>
+        <div class="fg" style="gap:12px">
+          <div class="fi"><label>Advance Already Paid (₹)</label><input type="number" id="advance-paid" min="0" value="0" oninput="recalc()" placeholder="0"></div>
+          <div class="fi"><label>Advance Receipt / Note</label><input id="advance-note" placeholder="Receipt no. or date of advance"></div>
+        </div>
       </div>
     </div>
 
@@ -471,6 +490,23 @@ input:disabled{background:#eaecef;color:#aaa;cursor:not-allowed}
   </div>
 
 </div>
+<!-- EDIT BILL MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span>✏️ Edit Bill — <span id="edit-pid-label"></span></span>
+      <button class="modal-close" onclick="closeEditModal()">✕ Close</button>
+    </div>
+    <div id="edit-modal-body">
+      <!-- Dynamically populated -->
+    </div>
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn btn-primary" onclick="saveEditedBill()">💾 Save Changes</button>
+      <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -478,9 +514,10 @@ input:disabled{background:#eaecef;color:#aaa;cursor:not-allowed}
 // CONFIG
 // ════════════════════════════════════════════════════════
 const FB = "https://ipd-billing-default-rtdb.asia-southeast1.firebasedatabase.app";
+// Passwords — for production, replace with server-side auth
 const ROLES = {
-  reception: "reception123",
-  admin:     "admin@chw2025"
+  reception: atob("cmVjZXB0aW9uMTIz"),   // reception123
+  admin:     atob("YWRtaW5AY2h3MjAyNQ==") // admin@chw2025
 };
 
 // ════════════════════════════════════════════════════════
@@ -718,16 +755,25 @@ function buildRows(v, q) {
         v.misc && [document.getElementById("misc-lbl")?.value || "Miscellaneous", "—", "—", v.misc]
     ]}
   ];
+  // custom lines (from edited bills)
+  if (q && q._customLines) {
+    q._customLines.forEach(cl => {
+      if (cl.amt > 0) {
+        html += `<tr><td>${cl.name}</td><td>${cl.qty}</td><td>₹${fmt(cl.rate)}</td><td class="tr mono">₹${fmt(cl.amt)}</td></tr>`;
+      }
+    });
+  }
   let html = "";
   s.forEach(sec => {
     const rows = sec.rows.filter(Boolean);
     if (!rows.length) return;
     html += `<tr class="tbl-sec"><td colspan="4">${sec.lbl}</td></tr>`;
     rows.forEach(r => {
+      hasAny = true;
       html += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="tr mono">₹${fmt(r[3])}</td></tr>`;
     });
   });
-  return html;
+  return hasAny ? html : '';
 }
 
 function recalc() {
@@ -742,11 +788,13 @@ function recalc() {
   const subtotal = Object.values(v).reduce((a, b) => a + b, 0);
   const discAmt  = Math.round(subtotal * disc / 100);
   const total    = subtotal - discAmt;
+  const advance  = parseInt(document.getElementById("advance-paid").value) || 0;
   const paid     = parseInt(document.getElementById("amt-paid").value) || 0;
-  const balance  = total - paid;
+  const totalPaid = advance + paid;
+  const balance  = total - totalPaid;
 
   document.getElementById("total-disp").textContent = "₹" + fmt(total);
-  document.getElementById("bal-disp").textContent = balance > 0 ? "Balance: ₹" + fmt(balance) : "";
+  document.getElementById("bal-disp").textContent = balance > 0 ? "Balance Due: ₹" + fmt(balance) : (balance < 0 ? "Overpaid: ₹" + fmt(Math.abs(balance)) : "✓ Fully Paid");
   document.getElementById("pid-display").textContent = generatePID();
 
   const q = {};
@@ -765,8 +813,11 @@ function recalc() {
   let f = `<tr><td colspan="3" style="text-align:right;padding:8px 12px;font-size:.78rem;color:var(--muted)">Subtotal</td><td class="tr mono" style="padding:8px 12px">₹${fmt(subtotal)}</td></tr>`;
   if (discAmt) f += `<tr><td colspan="3" style="text-align:right;padding:4px 12px;font-size:.78rem;color:var(--red)">Discount (${disc}%)</td><td class="tr mono" style="padding:4px 12px;color:var(--red)">−₹${fmt(discAmt)}</td></tr>`;
   f += `<tr class="tbl-total"><td colspan="3" style="padding:11px 12px">NET PAYABLE</td><td class="tr mono" style="padding:11px 12px;font-size:1rem">₹${fmt(total)}</td></tr>`;
-  if (paid > 0) f += `<tr><td colspan="3" style="text-align:right;padding:4px 12px;font-size:.78rem;color:var(--green)">Amount Paid</td><td class="tr mono" style="padding:4px 12px;color:var(--green)">₹${fmt(paid)}</td></tr>`;
+  if (advance > 0) f += `<tr><td colspan="3" style="text-align:right;padding:4px 12px;font-size:.78rem;color:var(--green)">Advance Paid</td><td class="tr mono" style="padding:4px 12px;color:var(--green)">−₹${fmt(advance)}</td></tr>`;
+  if (paid > 0) f += `<tr><td colspan="3" style="text-align:right;padding:4px 12px;font-size:.78rem;color:var(--green)">Paid Now</td><td class="tr mono" style="padding:4px 12px;color:var(--green)">−₹${fmt(paid)}</td></tr>`;
   if (balance > 0) f += `<tr><td colspan="3" style="text-align:right;padding:4px 12px;font-size:.78rem;color:var(--red);font-weight:700">Balance Due</td><td class="tr mono" style="padding:4px 12px;color:var(--red);font-weight:700">₹${fmt(balance)}</td></tr>`;
+  else if (balance < 0) f += `<tr><td colspan="3" style="text-align:right;padding:4px 12px;font-size:.78rem;color:var(--blue);font-weight:700">Refund Due</td><td class="tr mono" style="padding:4px 12px;color:var(--blue);font-weight:700">₹${fmt(Math.abs(balance))}</td></tr>`;
+  else f += `<tr><td colspan="4" style="text-align:center;padding:6px 12px;font-size:.8rem;color:var(--green);font-weight:700">✓ Fully Paid</td></tr>`;
   foot.innerHTML = f;
 }
 
@@ -812,6 +863,8 @@ function generateBill() {
 
   const pid  = generatePID();
   const disc = parseFloat(document.getElementById("discount").value) || 0;
+  const advance = parseInt(document.getElementById("advance-paid").value) || 0;
+  const advNote = document.getElementById("advance-note").value;
   const paid = parseInt(document.getElementById("amt-paid").value) || 0;
   const v    = getVals();
   const q    = {};
@@ -819,10 +872,12 @@ function generateBill() {
    "picc","uvc","photo","lp","icd","et","epis","dnc","anc","otm","otM","ag","as","otc","surg","misc"]
     .forEach(k => q[k] = gq(k));
 
+  const customLines = [];  // empty on new bill, populated on edit
   const subtotal = Object.values(v).reduce((a, b) => a + b, 0);
   const discAmt  = Math.round(subtotal * disc / 100);
   const total    = subtotal - discAmt;
-  const balance  = total - paid;
+  const totalPaid = advance + paid;
+  const balance  = total - totalPaid;
 
   const record = {
     pid, name,
@@ -838,7 +893,7 @@ function generateBill() {
     payMode:  document.getElementById("pay-mode").value,
     discReason: document.getElementById("disc-rsn").value,
     miscLabel:  document.getElementById("misc-lbl").value,
-    disc, discAmt, subtotal, total, paid, balance,
+    disc, discAmt, subtotal, total, advance, advNote, paid, totalPaid, balance, customLines,
     date: new Date().toLocaleString("en-IN"),
     vals: v, qty: q
   };
@@ -869,8 +924,11 @@ function buildReceipt(r) {
     <div class="ri" style="grid-column:1/-1"><label>Diagnosis</label><span>${r.diag||"—"}</span></div>
     <div class="ri"><label>Bill Date</label><span>${r.date}</span></div>`;
 
-  let html = buildRows(r.vals, r.qty);
+  const qWithCustom = { ...(r.qty||{}), _customLines: r.customLines||[] };
+  let html = buildRows(r.vals, qWithCustom);
   if (r.discAmt) html += `<tr><td colspan="3" style="text-align:right;color:var(--red);font-size:.78rem">Discount (${r.disc}%)${r.discReason?" — "+r.discReason:""}</td><td class="tr" style="color:var(--red)">−₹${fmt(r.discAmt)}</td></tr>`;
+  if (r.advance > 0) html += `<tr><td colspan="3" style="text-align:right;color:var(--green);font-size:.78rem">Advance Paid${r.advNote?" ("+r.advNote+")":""}</td><td class="tr" style="color:var(--green)">−₹${fmt(r.advance)}</td></tr>`;
+  if (r.paid > 0) html += `<tr><td colspan="3" style="text-align:right;color:var(--green);font-size:.78rem">Paid Now</td><td class="tr" style="color:var(--green)">−₹${fmt(r.paid)}</td></tr>`;
   document.getElementById("r-body").innerHTML = html;
 
   const bb = document.getElementById("r-bal-box");
@@ -943,6 +1001,7 @@ function renderAdminTable() {
       <td style="font-size:.76rem">${p.payMode||"—"}</td>
       <td>
         <button class="btn btn-teal btn-sm" onclick="viewBill(${idx})">🧾</button>
+        <button class="btn btn-outline btn-sm" style="margin-left:3px" onclick="openEditModal('${p.pid}')">✏️</button>
         <button class="btn btn-danger btn-sm" style="margin-left:3px" onclick="adminDelete('${p.pid}')">✕</button>
       </td>
     </tr>`;
@@ -1007,6 +1066,8 @@ function clearForm() {
   ["nsvd","lscs","forceps"].forEach(id => document.getElementById("chk-"+id).checked = false);
   document.getElementById("discount").value = 0;
   document.getElementById("amt-paid").value = 0;
+  document.getElementById("advance-paid").value = 0;
+  document.getElementById("advance-note").value = "";
   document.getElementById("pay-mode").value = "Cash";
   document.getElementById("cc-oxy").classList.remove("disabled");
   document.getElementById("vw").classList.remove("show");
@@ -1089,6 +1150,247 @@ document.addEventListener("keydown", function(e) {
   const idx = all.indexOf(e.target);
   if (idx > -1 && idx < all.length - 1) all[idx + 1].focus();
 });
+
+
+// ════════════════════════════════════════════════════════
+// ADMIN EDIT BILL
+// ════════════════════════════════════════════════════════
+let editingPid = null;
+let editLineIdx = 0;
+
+function openEditModal(pid) {
+  const p = allPatients.find(x => x.pid === pid);
+  if (!p) return;
+  editingPid = pid;
+  document.getElementById("edit-pid-label").textContent = pid + " — " + p.name;
+
+  const CHARGE_DEFS = [
+    // [key, label, rate, unit, isCheck]
+    ["reg","Registration Fee",200,"one-time",true],
+    ["nicu","NICU/PICU Bed",1500,"days",false],
+    ["ward","General Ward Bed",800,"days",false],
+    ["pvt","Private Cabin",1500,"days",false],
+    ["doc","Doctor's Visit",400,"days",false],
+    ["oxy","Oxygen Therapy",60,"hours",false],
+    ["cpap","CPAP/BiPAP",1500,"days",false],
+    ["vent","Ventilator",3000,"days",false],
+    ["mon","Monitor/Pulse Ox",25,"hours",false],
+    ["cons","Consumables Pack",350,"days",false],
+    ["inf","Infusion Pump",200,"days",false],
+    ["syr","Syringe Pump",150,"days",false],
+    ["neb","Nebulization",80,"sessions",false],
+    ["picc","PICC Line",4000,"proc",false],
+    ["uvc","Umbilical Line",2500,"proc",false],
+    ["photo","Phototherapy",500,"days",false],
+    ["lp","Lumbar Puncture",1500,"proc",false],
+    ["icd","ICD/Chest Drain",3000,"proc",false],
+    ["et","Intubation/ET Tube",800,"proc",false],
+    ["nsvd","Normal Delivery (NSVD)",5000,"package",true],
+    ["lscs","C-Section (LSCS)",25000,"package",true],
+    ["forceps","Forceps/Vacuum",12000,"package",true],
+    ["epis","Episiotomy",1500,"proc",false],
+    ["dnc","D&C / MTP",6000,"proc",false],
+    ["anc","ANC Consultation",500,"visits",false],
+    ["otm","Minor OT",4000,"proc",false],
+    ["otM","Major OT",15000,"proc",false],
+    ["ag","Anaesthesia (General)",5000,"proc",false],
+    ["as","Anaesthesia (Spinal)",3000,"proc",false],
+    ["otc","OT Consumables",2500,"proc",false],
+    ["surg","Surgeon/Specialist Fee",8000,"proc",false],
+  ];
+
+  const v = p.vals || {};
+  const q = p.qty  || {};
+
+  let rows = CHARGE_DEFS.map(([key, lbl, rate, unit, isChk]) => {
+    const val = v[key] || 0;
+    const qty = isChk ? (val > 0 ? 1 : 0) : (q[key] || 0);
+    if (!val && !qty) return "";  // skip zero items in edit view — but show them
+    const inputHtml = isChk
+      ? `<input type="checkbox" id="ec-${key}" ${val>0?"checked":""} onchange="editRecalc()" style="width:auto">`
+      : `<input type="number" id="ec-${key}" value="${qty}" min="0" class="cqty" style="width:70px" oninput="editRecalc()">`;
+    return `<tr>
+      <td>${lbl}</td>
+      <td style="font-size:.75rem;color:var(--muted)">₹${fmt(rate)}/${unit}</td>
+      <td>${inputHtml} <span style="font-size:.72rem;color:var(--muted)">${unit}</span></td>
+      <td class="tr mono" id="era-${key}">₹${fmt(val)}</td>
+      <td><button class="del-btn" title="Remove" onclick="editZero('${key}','${isChk}')">✕</button></td>
+    </tr>`;
+  }).join("");
+
+  // Custom charges (from misc + extras stored in customLines)
+  const customs = p.customLines || [];
+  let customHtml = customs.map((cl, i) => `
+    <div class="custom-row" id="ecl-${i}">
+      <input type="text" id="ecl-name-${i}" value="${cl.name}" placeholder="Item name">
+      <input type="number" id="ecl-qty-${i}" value="${cl.qty||1}" min="0" oninput="editRecalc()">
+      <input type="number" id="ecl-rate-${i}" value="${cl.rate||0}" min="0" placeholder="₹ rate" oninput="editRecalc()">
+      <button class="del-btn" onclick="removeCustomLine(${i})">✕</button>
+    </div>`).join("");
+
+  document.getElementById("edit-modal-body").innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="fi"><label>Discount (%)</label><input type="number" id="e-disc" value="${p.disc||0}" min="0" max="100" oninput="editRecalc()"></div>
+      <div class="fi"><label>Discount Reason</label><input id="e-disc-rsn" value="${p.discReason||""}"></div>
+      <div class="fi"><label>Advance Paid (₹)</label><input type="number" id="e-advance" value="${p.advance||0}" min="0" oninput="editRecalc()"></div>
+      <div class="fi"><label>Paid Now (₹)</label><input type="number" id="e-paid" value="${p.paid||0}" min="0" oninput="editRecalc()"></div>
+    </div>
+    <div style="font-size:.75rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Standard Charges</div>
+    <div style="overflow-x:auto;margin-bottom:16px">
+      <table class="tbl" id="edit-charges-table">
+        <thead><tr><th>Item</th><th>Rate</th><th>Qty / Include</th><th class="tr">Amount</th><th>Del</th></tr></thead>
+        <tbody id="edit-rows">${rows}</tbody>
+      </table>
+    </div>
+    <div style="font-size:.75rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Custom / Additional Charges</div>
+    <div id="custom-lines">${customHtml}</div>
+    <button class="btn btn-outline btn-sm" style="margin-top:8px" onclick="addCustomLine()">+ Add Item</button>
+    <div style="margin-top:16px;background:var(--tl);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:.72rem;color:var(--muted)">Net Payable</div>
+        <div id="e-total" class="mono" style="font-size:1.4rem;font-weight:700;color:var(--navy)">₹0</div>
+      </div>
+      <div style="text-align:right">
+        <div id="e-balance" style="font-size:.9rem;font-weight:700;color:var(--red)"></div>
+        <div id="e-paid-summary" style="font-size:.78rem;color:var(--green)"></div>
+      </div>
+    </div>`;
+
+  document.getElementById("edit-modal").classList.add("open");
+  editRecalc();
+}
+
+function closeEditModal() {
+  document.getElementById("edit-modal").classList.remove("open");
+  editingPid = null;
+}
+
+function editZero(key, isChk) {
+  const el = document.getElementById("ec-" + key);
+  if (!el) return;
+  if (isChk === "true") el.checked = false;
+  else el.value = 0;
+  editRecalc();
+}
+
+function addCustomLine() {
+  const i = editLineIdx++;
+  const div = document.createElement("div");
+  div.className = "custom-row";
+  div.id = "ecl-" + i;
+  div.innerHTML = `
+    <input type="text" id="ecl-name-${i}" placeholder="Item name e.g. X-ray">
+    <input type="number" id="ecl-qty-${i}" value="1" min="0" oninput="editRecalc()">
+    <input type="number" id="ecl-rate-${i}" value="0" min="0" placeholder="₹ rate" oninput="editRecalc()">
+    <button class="del-btn" onclick="this.closest('.custom-row').remove();editRecalc()">✕</button>`;
+  document.getElementById("custom-lines").appendChild(div);
+  editRecalc();
+}
+
+function removeCustomLine(i) {
+  const el = document.getElementById("ecl-" + i);
+  if (el) el.remove();
+  editRecalc();
+}
+
+function editRecalc() {
+  const RATE = {reg:200,nicu:1500,ward:800,pvt:1500,doc:400,oxy:60,cpap:1500,vent:3000,mon:25,cons:350,inf:200,syr:150,neb:80,picc:4000,uvc:2500,photo:500,lp:1500,icd:3000,et:800,nsvd:5000,lscs:25000,forceps:12000,epis:1500,dnc:6000,anc:500,otm:4000,otM:15000,ag:5000,as:3000,otc:2500,surg:8000};
+  const CHK_KEYS = ["reg","nsvd","lscs","forceps"];
+  let subtotal = 0;
+  Object.keys(RATE).forEach(k => {
+    const el = document.getElementById("ec-" + k);
+    if (!el) return;
+    let amt = 0;
+    if (CHK_KEYS.includes(k)) amt = el.checked ? RATE[k] : 0;
+    else amt = (parseInt(el.value)||0) * RATE[k];
+    const disp = document.getElementById("era-" + k);
+    if (disp) disp.textContent = amt ? "₹"+fmt(amt) : "₹0";
+    subtotal += amt;
+  });
+
+  // Custom lines
+  document.querySelectorAll("#custom-lines .custom-row").forEach(row => {
+    const id = row.id.replace("ecl-","");
+    const qty = parseInt(document.getElementById("ecl-qty-"+id)?.value)||0;
+    const rate = parseInt(document.getElementById("ecl-rate-"+id)?.value)||0;
+    subtotal += qty * rate;
+  });
+
+  const disc = parseFloat(document.getElementById("e-disc")?.value)||0;
+  const discAmt = Math.round(subtotal * disc / 100);
+  const total = subtotal - discAmt;
+  const advance = parseInt(document.getElementById("e-advance")?.value)||0;
+  const paid = parseInt(document.getElementById("e-paid")?.value)||0;
+  const totalPaid = advance + paid;
+  const balance = total - totalPaid;
+
+  const te = document.getElementById("e-total");
+  if (te) te.textContent = "₹" + fmt(total);
+  const be = document.getElementById("e-balance");
+  if (be) be.textContent = balance > 0 ? "Balance: ₹" + fmt(balance) : balance < 0 ? "Refund: ₹" + fmt(Math.abs(balance)) : "✓ Fully Paid";
+  const ps = document.getElementById("e-paid-summary");
+  if (ps && (advance+paid) > 0) ps.textContent = "Total paid: ₹" + fmt(totalPaid);
+}
+
+async function saveEditedBill() {
+  const pid = editingPid;
+  const p = allPatients.find(x => x.pid === pid);
+  if (!p) return;
+
+  const RATE = {reg:200,nicu:1500,ward:800,pvt:1500,doc:400,oxy:60,cpap:1500,vent:3000,mon:25,cons:350,inf:200,syr:150,neb:80,picc:4000,uvc:2500,photo:500,lp:1500,icd:3000,et:800,nsvd:5000,lscs:25000,forceps:12000,epis:1500,dnc:6000,anc:500,otm:4000,otM:15000,ag:5000,as:3000,otc:2500,surg:8000};
+  const CHK_KEYS = ["reg","nsvd","lscs","forceps"];
+
+  const newVals = {};
+  const newQty  = {};
+  let subtotal = 0;
+
+  Object.keys(RATE).forEach(k => {
+    const el = document.getElementById("ec-" + k);
+    if (!el) return;
+    let qty = 0, amt = 0;
+    if (CHK_KEYS.includes(k)) { qty = el.checked ? 1 : 0; amt = qty * RATE[k]; }
+    else { qty = parseInt(el.value)||0; amt = qty * RATE[k]; }
+    newVals[k] = amt;
+    newQty[k]  = qty;
+    subtotal  += amt;
+  });
+
+  // Collect custom lines
+  const customLines = [];
+  document.querySelectorAll("#custom-lines .custom-row").forEach(row => {
+    const id = row.id.replace("ecl-","");
+    const name = document.getElementById("ecl-name-"+id)?.value || "Custom";
+    const qty  = parseInt(document.getElementById("ecl-qty-"+id)?.value)||0;
+    const rate = parseInt(document.getElementById("ecl-rate-"+id)?.value)||0;
+    const amt  = qty * rate;
+    subtotal  += amt;
+    customLines.push({ name, qty, rate, amt });
+  });
+  newVals.misc = customLines.reduce((s,c) => s+c.amt, 0);
+
+  const disc     = parseFloat(document.getElementById("e-disc")?.value)||0;
+  const discReason = document.getElementById("e-disc-rsn")?.value||"";
+  const discAmt  = Math.round(subtotal * disc / 100);
+  const total    = subtotal - discAmt;
+  const advance  = parseInt(document.getElementById("e-advance")?.value)||0;
+  const paid     = parseInt(document.getElementById("e-paid")?.value)||0;
+  const totalPaid = advance + paid;
+  const balance  = total - totalPaid;
+
+  const updated = {
+    ...p,
+    vals: newVals, qty: newQty,
+    customLines,
+    disc, discReason, discAmt, subtotal, total,
+    advance, paid, totalPaid, balance,
+    editedBy: "admin",
+    editedAt: new Date().toLocaleString("en-IN")
+  };
+
+  await fbSave(updated);
+  closeEditModal();
+  toast("✅ Bill updated successfully");
+}
 
 // ════════════════════════════════════════════════════════
 // START
