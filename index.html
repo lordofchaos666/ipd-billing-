@@ -3,303 +3,330 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chandrawati Hospital — Billing System</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>Chandrawati Hospital — Billing</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#f0f4f8;--surface:#fff;--surface2:#f7fafc;--border:#dde3ec;
-    --navy:#0f2d4a;--teal:#0d7d6b;--teal-light:#e6f5f2;--teal-mid:#1aaa91;
-    --red:#c0392b;--gold:#b8860b;--purple:#6c3483;--pink:#b03a73;
-    --blue:#1565c0;--cyan:#00838f;--green:#2e7d32;--orange:#d35400;
-    --text:#1a2536;--muted:#6b7a91;
-    --shadow:0 4px 24px rgba(15,45,74,0.09);--shadow-sm:0 2px 8px rgba(15,45,74,0.07);
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-  header{background:var(--navy);color:white;padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:72px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,0.18)}
-  .header-brand{display:flex;align-items:center;gap:14px}
-  .header-logo{width:42px;height:42px;background:var(--teal-mid);border-radius:10px;display:grid;place-items:center;font-size:22px}
-  .header-title{font-family:'DM Serif Display',serif;font-size:1.4rem;letter-spacing:.01em}
-  .header-sub{font-size:.72rem;color:#8fa6bf;letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
-  .header-time{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#8fa6bf}
-  .app{max-width:1280px;margin:0 auto;padding:28px 20px 60px}
-  .section-title{font-family:'DM Serif Display',serif;font-size:1.05rem;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:10px}
-  .section-title::before{content:'';display:block;width:4px;height:20px;background:var(--teal-mid);border-radius:2px}
-  .card{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:24px 28px;box-shadow:var(--shadow-sm);margin-bottom:20px}
-  .tabs{display:flex;margin-bottom:24px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--surface2)}
-  .tab-btn{flex:1;padding:13px 8px;border:none;background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:500;color:var(--muted);transition:all .2s;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:6px}
-  .tab-btn:last-child{border-right:none}
-  .tab-btn.active{background:var(--navy);color:white}
-  .tab-btn:hover:not(.active){background:var(--teal-light);color:var(--teal)}
-  .tab-panel{display:none}.tab-panel.active{display:block}
-  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-  .form-grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px}
-  .form-group{display:flex;flex-direction:column;gap:5px}
-  .form-group.full{grid-column:1/-1}
-  label{font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-  input,select{padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--text);background:var(--surface2);transition:border-color .2s,box-shadow .2s;outline:none}
-  input:focus,select:focus{border-color:var(--teal-mid);box-shadow:0 0 0 3px rgba(13,125,107,.1);background:white}
-  input:disabled{background:#e8ecf0;color:#aab;cursor:not-allowed;opacity:.6}
-  .pid-display{font-family:'JetBrains Mono',monospace;font-size:1.05rem;font-weight:600;color:var(--teal);background:var(--teal-light);border:1.5px dashed var(--teal-mid);padding:11px 15px;border-radius:9px;letter-spacing:.06em}
-  .btn{padding:11px 22px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
-  .btn-primary{background:var(--navy);color:white}.btn-primary:hover{background:#1a3f60;transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,45,74,.3)}
-  .btn-teal{background:var(--teal);color:white}.btn-teal:hover{background:#0a6657;transform:translateY(-1px)}
-  .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--navy);color:var(--navy)}
-  .btn-danger{background:var(--red);color:white}.btn-danger:hover{background:#a93226}
-  .btn-sm{padding:7px 14px;font-size:.8rem}
-  .btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
-  .charge-section{margin-bottom:18px}
-  .charge-section-header{display:flex;align-items:center;gap:10px;margin-bottom:11px;padding:9px 14px;background:var(--navy);border-radius:10px;color:white}
-  .csh-icon{font-size:15px}.csh-title{font-size:.8rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-  .csh-sub{font-size:.7rem;color:#8fa6bf;margin-left:auto}
-  .charges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-  .charge-card{border:1.5px solid var(--border);border-radius:11px;padding:13px 15px;display:flex;align-items:flex-start;gap:11px;background:var(--surface2);transition:all .2s}
-  .charge-card.active-charge{border-color:var(--teal-mid);background:var(--teal-light)}
-  .charge-card.disabled-charge{opacity:.38;pointer-events:none}
-  .charge-icon{width:34px;height:34px;border-radius:9px;background:var(--navy);display:grid;place-items:center;font-size:15px;flex-shrink:0;margin-top:2px}
-  .charge-info{flex:1}
-  .charge-name{font-weight:600;font-size:.83rem;color:var(--text);line-height:1.2}
-  .charge-rate{font-size:.71rem;color:var(--muted);margin-top:2px}
-  .charge-input-row{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap}
-  .charge-qty{width:72px;text-align:center;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.86rem;padding:6px 8px}
-  .charge-unit{font-size:.7rem;color:var(--muted);white-space:nowrap}
-  .charge-amount{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.88rem;color:var(--teal);margin-left:auto}
-  .bill-table{width:100%;border-collapse:collapse;font-size:.87rem}
-  .bill-table th{background:var(--navy);color:white;padding:10px 13px;text-align:left;font-weight:500;font-size:.75rem;letter-spacing:.05em}
-  .bill-table th:first-child{border-radius:8px 0 0 0}.bill-table th:last-child{border-radius:0 8px 0 0}
-  .bill-table td{padding:9px 13px;border-bottom:1px solid var(--border)}
-  .bill-table tr:last-child td{border-bottom:none}
-  .bill-table tr:nth-child(even) td{background:var(--surface2)}
-  .bill-total-row td{background:var(--teal-light)!important;font-weight:700;color:var(--teal);border-top:2px solid var(--teal-mid)}
-  .bill-section-row td{background:#f0f4f8!important;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:5px 13px}
-  .patient-table{width:100%;border-collapse:collapse;font-size:.84rem}
-  .patient-table th{background:#1a3f60;color:white;padding:10px 12px;text-align:left;font-weight:500;font-size:.74rem;letter-spacing:.05em}
-  .patient-table td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
-  .patient-table tr:hover td{background:var(--teal-light)}
-  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.69rem;font-weight:600;letter-spacing:.04em}
-  .badge-nicu{background:#fff0f0;color:#c0392b}.badge-ward{background:#e8f5e9;color:#2e7d32}
-  .badge-pvt{background:#fff8e1;color:#b8860b}.badge-icu{background:#fce4ec;color:#880e4f}
-  .badge-obg{background:#f3e5f5;color:#6c3483}
-  .receipt{max-width:680px;margin:0 auto;border:1px solid var(--border);border-radius:16px;overflow:hidden;display:none}
-  .receipt.show{display:block}
-  .receipt-header{background:var(--navy);color:white;padding:22px 30px;text-align:center}
-  .receipt-header h2{font-family:'DM Serif Display',serif;font-size:1.4rem}
-  .receipt-header p{font-size:.77rem;color:#8fa6bf;margin-top:3px}
-  .receipt-pid{font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.1);padding:5px 14px;border-radius:20px;display:inline-block;margin-top:9px;font-size:.86rem;letter-spacing:.06em}
-  .receipt-body{padding:22px 28px}
-  .receipt-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-  .receipt-info-item label{font-size:.67rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
-  .receipt-info-item span{display:block;font-size:.86rem;font-weight:600;color:var(--text);margin-top:2px}
-  .receipt-divider{border:none;border-top:1.5px dashed var(--border);margin:14px 0}
-  .receipt-total-box{background:var(--navy);color:white;border-radius:12px;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:16px}
-  .receipt-total-label{font-size:.82rem;color:#8fa6bf}
-  .receipt-total-amount{font-family:'JetBrains Mono',monospace;font-size:1.45rem;font-weight:700}
-  .receipt-footer{background:var(--surface2);padding:11px 28px;text-align:center;font-size:.72rem;color:var(--muted);border-top:1px solid var(--border)}
-  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-  .stat-card{background:white;border-radius:14px;padding:17px 20px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
-  .stat-label{font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
-  .stat-value{font-family:'DM Serif Display',serif;font-size:1.85rem;color:var(--navy);margin-top:3px}
-  .stat-sub{font-size:.73rem;color:var(--teal);margin-top:2px}
-  .vent-warning{display:none;background:#fff3cd;border:1.5px solid #ffc107;border-radius:9px;padding:9px 14px;font-size:.79rem;color:#856404;margin-bottom:12px;align-items:center;gap:8px}
-  .vent-warning.show{display:flex}
-  .text-right{text-align:right}.text-mono{font-family:'JetBrains Mono',monospace}
-  .flex{display:flex}.gap-8{gap:8px}.items-center{align-items:center}.justify-between{justify-content:space-between}
-  .rc-cat{background:var(--navy);color:white;font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:7px 13px}
-  #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:white;padding:12px 26px;border-radius:40px;font-size:.86rem;font-weight:500;z-index:999;transition:transform .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.22);pointer-events:none;white-space:nowrap}
-  #toast.show{transform:translateX(-50%) translateY(0)}
-  @media print{body *{visibility:hidden}#print-area,#print-area *{visibility:visible}#print-area{position:fixed;top:0;left:0;width:100%}}
-  @media(max-width:768px){.form-grid,.form-grid-3,.form-grid-4{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.charges-grid{grid-template-columns:1fr}header{padding:0 14px}.app{padding:14px 10px 60px}.card{padding:16px 14px}.receipt-info-grid{grid-column:1fr}}
-  #login-screen{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center}
-  .login-box{background:white;border-radius:20px;padding:44px 44px;max-width:380px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,0.4);text-align:center}
-  .login-logo{width:62px;height:62px;background:var(--teal-mid);border-radius:16px;display:grid;place-items:center;font-size:28px;margin:0 auto 18px}
-  .login-title{font-family:'DM Serif Display',serif;font-size:1.55rem;color:var(--navy);margin-bottom:4px}
-  .login-sub{font-size:.8rem;color:var(--muted);margin-bottom:26px}
-  .login-input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;text-align:center;letter-spacing:.1em;outline:none;transition:border-color .2s;box-sizing:border-box}
-  .login-input:focus{border-color:var(--teal-mid);box-shadow:0 0 0 3px rgba(13,125,107,.1)}
-  .login-btn{width:100%;margin-top:12px;padding:13px;background:var(--navy);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.93rem;font-weight:600;cursor:pointer;transition:all .2s}
-  .login-btn:hover{background:#1a3f60}
-  .login-err{display:none;margin-top:10px;background:#fff0f0;border:1px solid #e74c3c;border-radius:8px;padding:9px;font-size:.78rem;color:#c0392b}
-  .login-note{margin-top:14px;font-size:.7rem;color:var(--muted)}
+:root{--bg:#f0f4f8;--surface:#fff;--s2:#f7fafc;--border:#dde3ec;--navy:#0f2d4a;--teal:#0d7d6b;--tl:#e6f5f2;--tm:#1aaa91;--red:#c0392b;--gold:#b8860b;--purple:#6c3483;--green:#2e7d32;--blue:#1565c0;--text:#1a2536;--muted:#6b7a91}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* LOGIN */
+#login-wrap{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center}
+.lbox{background:#fff;border-radius:20px;padding:48px 44px;max-width:380px;width:92%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,.4)}
+.licon{width:64px;height:64px;background:var(--tm);border-radius:16px;display:grid;place-items:center;font-size:30px;margin:0 auto 18px}
+.ltitle{font-family:"DM Serif Display",serif;font-size:1.6rem;color:var(--navy);margin-bottom:4px}
+.lsub{font-size:.8rem;color:var(--muted);margin-bottom:28px}
+.lroles{display:flex;gap:10px;margin-bottom:20px}
+.lrole{flex:1;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--muted);transition:all .2s;background:#fff}
+.lrole.sel{border-color:var(--navy);background:var(--navy);color:#fff}
+.linput{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:"DM Sans",sans-serif;font-size:.95rem;text-align:center;letter-spacing:.08em;outline:none;transition:border-color .2s;margin-bottom:10px}
+.linput:focus{border-color:var(--tm);box-shadow:0 0 0 3px rgba(26,170,145,.12)}
+.lbtn{width:100%;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-family:"DM Sans",sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:background .2s}
+.lbtn:hover{background:#1a3f60}
+.lerr{display:none;margin-top:10px;background:#fff0f0;border:1px solid #e74c3c;border-radius:8px;padding:8px;font-size:.78rem;color:#c0392b}
+
+/* HEADER */
+header{background:var(--navy);color:#fff;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:68px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.18)}
+.hbrand{display:flex;align-items:center;gap:12px}
+.hlogo{width:40px;height:40px;background:var(--tm);border-radius:10px;display:grid;place-items:center;font-size:20px}
+.htitle{font-family:"DM Serif Display",serif;font-size:1.3rem}
+.hsub{font-size:.68rem;color:#8fa6bf;letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
+.hright{display:flex;align-items:center;gap:12px}
+.hclock{font-family:"JetBrains Mono",monospace;font-size:.8rem;color:#8fa6bf}
+.huser{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:8px;font-size:.74rem;font-weight:600}
+.hlogout{background:transparent;border:1px solid rgba(255,255,255,.2);color:#8fa6bf;padding:5px 12px;border-radius:8px;font-size:.73rem;cursor:pointer;transition:all .2s}
+.hlogout:hover{border-color:#fff;color:#fff}
+#sync-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);padding:5px 12px;border-radius:20px;font-size:.72rem;font-weight:600}
+#sync-dot{width:7px;height:7px;border-radius:50%;background:#ffc107;transition:background .3s}
+
+/* LAYOUT */
+.app{max-width:1280px;margin:0 auto;padding:24px 18px 60px}
+.sec-title{font-family:"DM Serif Display",serif;font-size:1rem;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:"";display:block;width:4px;height:18px;background:var(--tm);border-radius:2px}
+.card{background:var(--surface);border-radius:14px;border:1px solid var(--border);padding:22px 26px;margin-bottom:18px;box-shadow:0 2px 8px rgba(15,45,74,.07)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid var(--border)}
+.stat-lbl{font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.stat-val{font-family:"DM Serif Display",serif;font-size:1.8rem;color:var(--navy);margin-top:2px}
+.stat-sub{font-size:.72rem;color:var(--teal);margin-top:1px}
+
+/* TABS */
+.tabs{display:flex;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--s2);margin-bottom:20px}
+.tab{flex:1;padding:12px 6px;border:none;background:transparent;cursor:pointer;font-family:"DM Sans",sans-serif;font-size:.8rem;font-weight:500;color:var(--muted);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s}
+.tab:last-child{border-right:none}
+.tab.active{background:var(--navy);color:#fff}
+.tab:hover:not(.active){background:var(--tl);color:var(--teal)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* FORMS */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.fg4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
+.fi{display:flex;flex-direction:column;gap:4px}
+.fi.full{grid-column:1/-1}
+.fi label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+input,select{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:"DM Sans",sans-serif;font-size:.88rem;color:var(--text);background:var(--s2);outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+input:focus,select:focus{border-color:var(--tm);box-shadow:0 0 0 3px rgba(26,170,145,.1);background:#fff}
+input:disabled{background:#eaecef;color:#aaa;cursor:not-allowed}
+.pid-box{font-family:"JetBrains Mono",monospace;font-size:1rem;font-weight:600;color:var(--teal);background:var(--tl);border:1.5px dashed var(--tm);padding:10px 14px;border-radius:8px;letter-spacing:.06em}
+
+/* CHARGE SECTIONS */
+.cs-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:var(--navy);border-radius:9px;color:#fff}
+.cs-hdr.obg{background:#4a235a}
+.cs-hdr.ot{background:#1b2631}
+.cs-hdr.misc{background:#37474f}
+.cs-title{font-size:.77rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.cs-sub{font-size:.68rem;color:#8fa6bf;margin-left:auto}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px;margin-bottom:16px}
+.cc{border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;background:var(--s2);transition:all .2s}
+.cc.on{border-color:var(--tm);background:var(--tl)}
+.cc.disabled{opacity:.35;pointer-events:none}
+.ci{width:32px;height:32px;border-radius:8px;background:var(--navy);display:grid;place-items:center;font-size:14px;flex-shrink:0;margin-top:2px}
+.cn{font-weight:600;font-size:.8rem;line-height:1.2}
+.cr{font-size:.69rem;color:var(--muted);margin-top:1px}
+.cir{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
+.cqty{width:68px;text-align:center;font-family:"JetBrains Mono",monospace;font-weight:600;font-size:.84rem;padding:5px 6px}
+.cu{font-size:.68rem;color:var(--muted)}
+.ca{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:.84rem;color:var(--teal);margin-left:auto}
+
+/* VENT WARNING */
+.vw{display:none;background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;padding:8px 12px;font-size:.77rem;color:#856404;margin-bottom:10px;align-items:center;gap:7px}
+.vw.show{display:flex}
+
+/* BUTTONS */
+.btn{padding:10px 20px;border:none;border-radius:9px;font-family:"DM Sans",sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:#1a3f60;transform:translateY(-1px)}
+.btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:#0a6657}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--navy)}
+.btn-danger{background:var(--red);color:#fff}
+.btn-sm{padding:6px 12px;font-size:.77rem}
+.btn-row{display:flex;gap:9px;margin-top:18px;flex-wrap:wrap}
+
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;font-size:.84rem}
+.tbl th{background:var(--navy);color:#fff;padding:10px 12px;text-align:left;font-weight:500;font-size:.73rem;letter-spacing:.05em}
+.tbl th:first-child{border-radius:7px 0 0 0}.tbl th:last-child{border-radius:0 7px 0 0}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:nth-child(even) td{background:var(--s2)}
+.tbl tr:hover td{background:var(--tl)}
+.tbl-sec td{background:#f0f4f8!important;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:4px 12px}
+.tbl-total td{background:var(--tl)!important;font-weight:700;color:var(--teal);border-top:2px solid var(--tm)}
+.tr{text-align:right}.mono{font-family:"JetBrains Mono",monospace}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.67rem;font-weight:600}
+.b-nicu{background:#fff0f0;color:#c0392b}.b-ward{background:#e8f5e9;color:#2e7d32}
+.b-pvt{background:#fff8e1;color:#b8860b}.b-icu{background:#fce4ec;color:#880e4f}
+.b-obg{background:#f3e5f5;color:#6c3483}
+
+/* RECEIPT */
+.receipt{max-width:660px;margin:0 auto;border:1px solid var(--border);border-radius:14px;overflow:hidden;display:none}
+.receipt.show{display:block}
+.rh{background:var(--navy);color:#fff;padding:20px 28px;text-align:center}
+.rh h2{font-family:"DM Serif Display",serif;font-size:1.35rem}
+.rh p{font-size:.75rem;color:#8fa6bf;margin-top:3px}
+.rpid{font-family:"JetBrains Mono",monospace;background:rgba(255,255,255,.12);padding:5px 14px;border-radius:20px;display:inline-block;margin-top:8px;font-size:.84rem}
+.rb{padding:20px 28px}
+.rig{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ri label{font-size:.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.ri span{display:block;font-size:.84rem;font-weight:600;color:var(--text);margin-top:2px}
+.rdiv{border:none;border-top:1.5px dashed var(--border);margin:12px 0}
+.rtotal{background:var(--navy);color:#fff;border-radius:10px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.rtotal-lbl{font-size:.8rem;color:#8fa6bf}
+.rtotal-amt{font-family:"JetBrains Mono",monospace;font-size:1.4rem;font-weight:700}
+.rbal{background:#fff3cd;border:1px solid #ffc107;border-radius:9px;padding:10px 16px;margin-top:10px;display:none;justify-content:space-between;align-items:center}
+.rf{background:var(--s2);padding:10px 28px;text-align:center;font-size:.7rem;color:var(--muted);border-top:1px solid var(--border)}
+
+/* ADMIN */
+.admin-hdr{background:linear-gradient(135deg,#1b2631,#2c3e50);color:#fff;border-radius:12px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.admin-badge{background:#c0392b;color:#fff;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.06em}
+.rc-cat{background:var(--navy);color:#fff;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:6px 12px}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:11px 24px;border-radius:40px;font-size:.84rem;font-weight:500;z-index:9998;transition:transform .3s;box-shadow:0 8px 32px rgba(0,0,0,.22);pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+@media print{body *{visibility:hidden}#print-area,#print-area *{visibility:visible}#print-area{position:fixed;top:0;left:0;width:100%}}
+@media(max-width:768px){.fg,.fg3,.fg4{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.cg{grid-template-columns:1fr}header{padding:0 12px}.app{padding:12px 10px 60px}.rig{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header>
-  <div class="header-brand">
-    <div class="header-logo">🏥</div>
-    <div>
-      <div class="header-title">Chandrawati Hospital</div>
-      <div class="header-sub">Billing Management System</div>
-    </div>
-  </div>
-  <div style="display:flex;align-items:center;gap:14px">
-    <div class="header-time" id="clock"></div>
-    <button onclick="logout()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#8fa6bf;padding:6px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.75rem;cursor:pointer" title="Log out">⏏ Logout</button>
-  </div>
-</header>
 
-<!-- LOGIN SCREEN -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">🏥</div>
-    <div class="login-title">Chandrawati Hospital</div>
-    <div class="login-sub">Billing System — Enter access password to continue</div>
-    <input type="password" id="login-pass" class="login-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">Unlock &amp; Sync →</button>
-    <div class="login-err" id="login-err">Incorrect password. Try again.</div>
-    <div class="login-note">🔒 Stay logged in on this device permanently</div>
+<!-- LOGIN -->
+<div id="login-wrap">
+  <div class="lbox">
+    <div class="licon">🏥</div>
+    <div class="ltitle">Chandrawati Hospital</div>
+    <div class="lsub">Billing System — Select role and enter password</div>
+    <div class="lroles">
+      <div class="lrole sel" id="role-reception" onclick="selRole(this,'reception')">🖥️ Reception</div>
+      <div class="lrole" id="role-admin" onclick="selRole(this,'admin')">🔐 Admin</div>
+    </div>
+    <input type="password" id="login-pass" class="linput" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lbtn" onclick="doLogin()">Unlock &amp; Sync →</button>
+    <div class="lerr" id="lerr">Incorrect password. Try again.</div>
   </div>
 </div>
 
+<!-- HEADER -->
+<header>
+  <div class="hbrand">
+    <div class="hlogo">🏥</div>
+    <div>
+      <div class="htitle">Chandrawati Hospital</div>
+      <div class="hsub">Billing Management System</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div id="sync-badge">
+      <span id="sync-dot"></span>
+      <span id="sync-txt">Connecting…</span>
+    </div>
+    <div class="hclock" id="clock"></div>
+    <span class="huser" id="user-badge">—</span>
+    <button class="hlogout" onclick="doLogout()">⏏ Logout</button>
+  </div>
+</header>
+
 <div class="app">
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-label">Total Patients</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">Registered</div></div>
-    <div class="stat-card"><div class="stat-label">Bills Generated</div><div class="stat-value" id="stat-bills">0</div><div class="stat-sub">This session</div></div>
-    <div class="stat-card"><div class="stat-label">Avg Bill Value</div><div class="stat-value" id="stat-revenue">₹0</div><div class="stat-sub">Per patient</div></div>
-    <div class="stat-card"><div class="stat-label">Pending Balance</div><div class="stat-value" id="stat-pending">0</div><div class="stat-sub">Part-payment cases</div></div>
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">Total Patients</div><div class="stat-val" id="s-total">0</div><div class="stat-sub" id="s-period">—</div></div>
+    <div class="stat"><div class="stat-lbl">Bills Generated</div><div class="stat-val" id="s-bills">0</div><div class="stat-sub">This period</div></div>
+    <div class="stat"><div class="stat-lbl">Avg Bill Value</div><div class="stat-val" id="s-avg">₹0</div><div class="stat-sub">Per patient</div></div>
+    <div class="stat"><div class="stat-lbl">Pending Balance</div><div class="stat-val" id="s-pending">0</div><div class="stat-sub">Part-payment cases</div></div>
   </div>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('new-bill',this)">➕ New Bill</button>
-    <button class="tab-btn" onclick="switchTab('patients',this)">👥 Patient Records</button>
-    <button class="tab-btn" onclick="switchTab('rate-card',this)">📋 Rate Card</button>
+  <!-- TABS — dynamically shown by role -->
+  <div class="tabs" id="main-tabs">
+    <button class="tab active" onclick="switchTab('new-bill',this)">➕ New Bill</button>
+    <button class="tab" onclick="switchTab('patients',this)">👥 Patient Records</button>
+    <button class="tab" onclick="switchTab('rate-card',this)">📋 Rate Card</button>
+    <button class="tab" id="admin-tab" style="display:none;background:#c0392b;color:#fff" onclick="switchTab('admin',this)">🔐 Admin</button>
   </div>
 
-  <!-- ═══════════ TAB: NEW BILL ═══════════ -->
+  <!-- ═══ TAB: NEW BILL ═══ -->
   <div class="tab-panel active" id="tab-new-bill">
     <div class="card">
-      <div class="section-title">Patient Information</div>
-      <div class="form-grid">
-        <div class="form-group"><label>Patient ID (Auto)</label><div class="pid-display" id="pid-display">CHW-—</div></div>
-        <div class="form-group"><label>Full Name *</label><input type="text" id="p-name" placeholder="Patient full name"></div>
-        <div class="form-group"><label>Age</label><input type="text" id="p-age" placeholder="e.g. 3 yrs / 4 mo / D2 neonate"></div>
-        <div class="form-group"><label>Gender</label><select id="p-gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
-        <div class="form-group"><label>Guardian / Mother Name</label><input type="text" id="p-guardian" placeholder="Father / Mother / Guardian"></div>
-        <div class="form-group"><label>Contact Number</label><input type="tel" id="p-contact" placeholder="+91 XXXXX XXXXX"></div>
-        <div class="form-group"><label>Admission Date</label><input type="date" id="p-admit"></div>
-        <div class="form-group"><label>Discharge Date</label><input type="date" id="p-discharge"></div>
-        <div class="form-group full"><label>Diagnosis / Reason for Admission</label><input type="text" id="p-diagnosis" placeholder="Primary diagnosis"></div>
-        <div class="form-group"><label>Department / Ward</label><select id="p-ward" onchange="autoSelectWard()"><option value="">Select ward</option><option value="nicu">NICU</option><option value="picu">PICU</option><option value="ward">General Ward</option><option value="pvt">Private Cabin</option><option value="obg">OBG / Maternity</option></select></div>
-        <div class="form-group"><label>Attending Doctor</label><input type="text" id="p-doctor" value="Dr. Ritik Chandra"></div>
+      <div class="sec-title">Patient Information</div>
+      <div class="fg">
+        <div class="fi"><label>Patient ID</label><div class="pid-box" id="pid-display">CHW-—</div></div>
+        <div class="fi"><label>Full Name *</label><input id="p-name" placeholder="Patient full name"></div>
+        <div class="fi"><label>Age</label><input id="p-age" placeholder="3 yrs / 4 mo / D2 neonate"></div>
+        <div class="fi"><label>Gender</label><select id="p-gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+        <div class="fi"><label>Guardian / Mother</label><input id="p-guardian" placeholder="Father / Mother / Guardian"></div>
+        <div class="fi"><label>Contact Number</label><input id="p-contact" type="tel" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="fi"><label>Admission Date</label><input id="p-admit" type="date"></div>
+        <div class="fi"><label>Discharge Date</label><input id="p-discharge" type="date"></div>
+        <div class="fi full"><label>Diagnosis</label><input id="p-diagnosis" placeholder="Primary diagnosis"></div>
+        <div class="fi"><label>Department / Ward</label><select id="p-ward" onchange="autoWard()"><option value="">Select</option><option value="nicu">NICU</option><option value="picu">PICU</option><option value="ward">General Ward</option><option value="pvt">Private Cabin</option><option value="obg">OBG / Maternity</option></select></div>
+        <div class="fi"><label>Attending Doctor</label><input id="p-doctor" value="Dr. Ritik Chandra"></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="section-title">Charges &amp; Services</div>
-      <div class="vent-warning" id="vent-warning">⚠️ <strong>Ventilator active</strong> — Oxygen charge disabled automatically (included in ventilator support).</div>
+      <div class="sec-title">Charges &amp; Services</div>
+      <div class="vw" id="vw">⚠️ <strong>Ventilator active</strong> — Oxygen charge disabled automatically.</div>
 
-      <!-- 1. BED -->
-      <div class="charge-section">
-        <div class="charge-section-header"><span class="csh-icon">🏠</span><span class="csh-title">Registration &amp; Bed</span><span class="csh-sub">Daily / One-time</span></div>
-        <div class="charges-grid">
-          <div class="charge-card active-charge" id="cc-reg"><div class="charge-icon">📝</div><div class="charge-info"><div class="charge-name">Registration Fee</div><div class="charge-rate">₹200 — one-time</div><div class="charge-input-row"><input type="checkbox" id="chk-reg" checked onchange="recalc()" style="width:auto;margin:0;padding:0"><span class="charge-unit">Include</span><span class="charge-amount" id="amt-reg">₹200</span></div></div></div>
-          <div class="charge-card" id="cc-nicu"><div class="charge-icon" style="background:#c0392b">🧠</div><div class="charge-info"><div class="charge-name">NICU / PICU Bed</div><div class="charge-rate">₹1,500 / day</div><div class="charge-input-row"><input type="number" id="qty-nicu" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-nicu">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-ward"><div class="charge-icon" style="background:#2e7d32">🛏️</div><div class="charge-info"><div class="charge-name">General Ward Bed</div><div class="charge-rate">₹800 / day</div><div class="charge-input-row"><input type="number" id="qty-ward" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-ward">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-pvt"><div class="charge-icon" style="background:#b8860b">🌟</div><div class="charge-info"><div class="charge-name">Private Cabin</div><div class="charge-rate">₹1,500 / day</div><div class="charge-input-row"><input type="number" id="qty-pvt" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-pvt">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-doc"><div class="charge-icon" style="background:#1565c0">👨‍⚕️</div><div class="charge-info"><div class="charge-name">Doctor's Visit</div><div class="charge-rate">₹400 / day</div><div class="charge-input-row"><input type="number" id="qty-doc" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-doc">₹0</span></div></div></div>
-        </div>
+      <!-- BED -->
+      <div class="cs-hdr"><span>🏠</span><span class="cs-title">Registration &amp; Bed</span><span class="cs-sub">Daily / One-time</span></div>
+      <div class="cg">
+        <div class="cc on" id="cc-reg"><div class="ci">📝</div><div><div class="cn">Registration Fee</div><div class="cr">₹200 — one-time</div><div class="cir"><input type="checkbox" id="chk-reg" checked onchange="recalc()" style="width:auto"><span class="cu">Include</span><span class="ca" id="a-reg">₹200</span></div></div></div>
+        <div class="cc" id="cc-nicu"><div class="ci" style="background:#c0392b">🧠</div><div><div class="cn">NICU / PICU Bed</div><div class="cr">₹1,500 / day</div><div class="cir"><input type="number" id="q-nicu" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">days</span><span class="ca" id="a-nicu">₹0</span></div></div></div>
+        <div class="cc" id="cc-ward"><div class="ci" style="background:#2e7d32">🛏️</div><div><div class="cn">General Ward Bed</div><div class="cr">₹800 / day</div><div class="cir"><input type="number" id="q-ward" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">days</span><span class="ca" id="a-ward">₹0</span></div></div></div>
+        <div class="cc" id="cc-pvt"><div class="ci" style="background:#b8860b">🌟</div><div><div class="cn">Private Cabin</div><div class="cr">₹1,500 / day</div><div class="cir"><input type="number" id="q-pvt" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">days</span><span class="ca" id="a-pvt">₹0</span></div></div></div>
+        <div class="cc" id="cc-doc"><div class="ci" style="background:#1565c0">👨‍⚕️</div><div><div class="cn">Doctor's Visit</div><div class="cr">₹400 / day</div><div class="cir"><input type="number" id="q-doc" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">days</span><span class="ca" id="a-doc">₹0</span></div></div></div>
       </div>
 
-      <!-- 2. RESPIRATORY -->
-      <div class="charge-section">
-        <div class="charge-section-header"><span class="csh-icon">💨</span><span class="csh-title">Respiratory Support</span><span class="csh-sub">Ventilator disables Oxygen</span></div>
-        <div class="charges-grid">
-          <div class="charge-card" id="cc-oxy"><div class="charge-icon" style="background:#00838f">💨</div><div class="charge-info"><div class="charge-name">Oxygen Therapy</div><div class="charge-rate">₹60 / hour</div><div class="charge-input-row"><input type="number" id="qty-oxy" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">hours</span><span class="charge-amount" id="amt-oxy">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-cpap"><div class="charge-icon" style="background:#4a235a">🫁</div><div class="charge-info"><div class="charge-name">CPAP / BiPAP</div><div class="charge-rate">₹1,500 / day</div><div class="charge-input-row"><input type="number" id="qty-cpap" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-cpap">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-vent"><div class="charge-icon" style="background:#922b21">⚙️</div><div class="charge-info"><div class="charge-name">Ventilator</div><div class="charge-rate">₹3,000 / day — disables O₂</div><div class="charge-input-row"><input type="number" id="qty-vent" class="charge-qty" min="0" value="0" oninput="ventCheck()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-vent">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-mon"><div class="charge-icon" style="background:#4527a0">📡</div><div class="charge-info"><div class="charge-name">Monitor / Pulse Ox</div><div class="charge-rate">₹25 / hour</div><div class="charge-input-row"><input type="number" id="qty-mon" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">hours</span><span class="charge-amount" id="amt-mon">₹0</span></div></div></div>
-        </div>
+      <!-- RESPIRATORY -->
+      <div class="cs-hdr"><span>💨</span><span class="cs-title">Respiratory Support</span><span class="cs-sub">Ventilator disables Oxygen</span></div>
+      <div class="cg">
+        <div class="cc" id="cc-oxy"><div class="ci" style="background:#00838f">💨</div><div><div class="cn">Oxygen Therapy</div><div class="cr">₹60 / hour</div><div class="cir"><input type="number" id="q-oxy" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">hrs</span><span class="ca" id="a-oxy">₹0</span></div></div></div>
+        <div class="cc" id="cc-cpap"><div class="ci" style="background:#4a235a">🫁</div><div><div class="cn">CPAP / BiPAP</div><div class="cr">₹1,500 / day</div><div class="cir"><input type="number" id="q-cpap" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">days</span><span class="ca" id="a-cpap">₹0</span></div></div></div>
+        <div class="cc" id="cc-vent"><div class="ci" style="background:#922b21">⚙️</div><div><div class="cn">Ventilator</div><div class="cr">₹3,000 / day</div><div class="cir"><input type="number" id="q-vent" class="cqty" min="0" value="0" oninput="ventChk()"><span class="cu">days</span><span class="ca" id="a-vent">₹0</span></div></div></div>
+        <div class="cc" id="cc-mon"><div class="ci" style="background:#4527a0">📡</div><div><div class="cn">Monitor / Pulse Ox</div><div class="cr">₹25 / hour</div><div class="cir"><input type="number" id="q-mon" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">hrs</span><span class="ca" id="a-mon">₹0</span></div></div></div>
       </div>
 
-      <!-- 3. CONSUMABLES -->
-      <div class="charge-section">
-        <div class="charge-section-header"><span class="csh-icon">💉</span><span class="csh-title">Consumables &amp; Infusion</span><span class="csh-sub">Per day / Per session</span></div>
-        <div class="charges-grid">
-          <div class="charge-card" id="cc-cons"><div class="charge-icon" style="background:#1b5e20">🧴</div><div class="charge-info"><div class="charge-name">Consumables Pack</div><div class="charge-rate">₹350 / day (cannula, gloves, IV sets, syringes)</div><div class="charge-input-row"><input type="number" id="qty-cons" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-cons">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-inf"><div class="charge-icon" style="background:#0d47a1">🩸</div><div class="charge-info"><div class="charge-name">Infusion Pump</div><div class="charge-rate">₹200 / day</div><div class="charge-input-row"><input type="number" id="qty-inf" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-inf">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-syr"><div class="charge-icon" style="background:#006064">💊</div><div class="charge-info"><div class="charge-name">Syringe Pump</div><div class="charge-rate">₹150 / day</div><div class="charge-input-row"><input type="number" id="qty-syr" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-syr">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-neb"><div class="charge-icon" style="background:#33691e">🫧</div><div class="charge-info"><div class="charge-name">Nebulization</div><div class="charge-rate">₹80 / session</div><div class="charge-input-row"><input type="number" id="qty-neb" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">sessions</span><span class="charge-amount" id="amt-neb">₹0</span></div></div></div>
-        </div>
+      <!-- CONSUMABLES -->
+      <div class="cs-hdr"><span>💉</span><span class="cs-title">Consumables &amp; Infusion</span><span class="cs-sub">Per day / session</span></div>
+      <div class="cg">
+        <div class="cc" id="cc-cons"><div class="ci" style="background:#1b5e20">🧴</div><div><div class="cn">Consumables Pack</div><div class="cr">₹350 / day</div><div class="cir"><input type="number" id="q-cons" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">days</span><span class="ca" id="a-cons">₹0</span></div></div></div>
+        <div class="cc" id="cc-inf"><div class="ci" style="background:#0d47a1">🩸</div><div><div class="cn">Infusion Pump</div><div class="cr">₹200 / day</div><div class="cir"><input type="number" id="q-inf" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">days</span><span class="ca" id="a-inf">₹0</span></div></div></div>
+        <div class="cc" id="cc-syr"><div class="ci" style="background:#006064">💊</div><div><div class="cn">Syringe Pump</div><div class="cr">₹150 / day</div><div class="cir"><input type="number" id="q-syr" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">days</span><span class="ca" id="a-syr">₹0</span></div></div></div>
+        <div class="cc" id="cc-neb"><div class="ci" style="background:#33691e">🫧</div><div><div class="cn">Nebulization</div><div class="cr">₹80 / session</div><div class="cir"><input type="number" id="q-neb" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">sessions</span><span class="ca" id="a-neb">₹0</span></div></div></div>
       </div>
 
-      <!-- 4. PROCEDURES -->
-      <div class="charge-section">
-        <div class="charge-section-header"><span class="csh-icon">🔬</span><span class="csh-title">Neonatal &amp; Paediatric Procedures</span><span class="csh-sub">Per procedure</span></div>
-        <div class="charges-grid">
-          <div class="charge-card" id="cc-picc"><div class="charge-icon" style="background:#880e4f">🔗</div><div class="charge-info"><div class="charge-name">PICC Line Insertion</div><div class="charge-rate">₹4,000 / procedure</div><div class="charge-input-row"><input type="number" id="qty-picc" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-picc">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-uvc"><div class="charge-icon" style="background:#b71c1c">🩺</div><div class="charge-info"><div class="charge-name">Umbilical Line (UAC/UVC)</div><div class="charge-rate">₹2,500 / procedure</div><div class="charge-input-row"><input type="number" id="qty-uvc" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-uvc">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-photo"><div class="charge-icon" style="background:#e65100">💡</div><div class="charge-info"><div class="charge-name">Phototherapy</div><div class="charge-rate">₹500 / day</div><div class="charge-input-row"><input type="number" id="qty-photo" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">days</span><span class="charge-amount" id="amt-photo">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-lp"><div class="charge-icon" style="background:#37474f">🔩</div><div class="charge-info"><div class="charge-name">Lumbar Puncture</div><div class="charge-rate">₹1,500 / procedure</div><div class="charge-input-row"><input type="number" id="qty-lp" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-lp">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-icd"><div class="charge-icon" style="background:#4e342e">🫀</div><div class="charge-info"><div class="charge-name">ICD / Chest Drain</div><div class="charge-rate">₹3,000 / procedure</div><div class="charge-input-row"><input type="number" id="qty-icd" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-icd">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-et"><div class="charge-icon" style="background:#1a237e">🫁</div><div class="charge-info"><div class="charge-name">Intubation / ET Tube</div><div class="charge-rate">₹800 / procedure</div><div class="charge-input-row"><input type="number" id="qty-et" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-et">₹0</span></div></div></div>
-        </div>
+      <!-- PROCEDURES -->
+      <div class="cs-hdr"><span>🔬</span><span class="cs-title">Neonatal &amp; Paediatric Procedures</span><span class="cs-sub">Per procedure</span></div>
+      <div class="cg">
+        <div class="cc" id="cc-picc"><div class="ci" style="background:#880e4f">🔗</div><div><div class="cn">PICC Line</div><div class="cr">₹4,000</div><div class="cir"><input type="number" id="q-picc" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-picc">₹0</span></div></div></div>
+        <div class="cc" id="cc-uvc"><div class="ci" style="background:#b71c1c">🩺</div><div><div class="cn">Umbilical Line (UAC/UVC)</div><div class="cr">₹2,500</div><div class="cir"><input type="number" id="q-uvc" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-uvc">₹0</span></div></div></div>
+        <div class="cc" id="cc-photo"><div class="ci" style="background:#e65100">💡</div><div><div class="cn">Phototherapy</div><div class="cr">₹500 / day</div><div class="cir"><input type="number" id="q-photo" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">days</span><span class="ca" id="a-photo">₹0</span></div></div></div>
+        <div class="cc" id="cc-lp"><div class="ci" style="background:#37474f">🔩</div><div><div class="cn">Lumbar Puncture</div><div class="cr">₹1,500</div><div class="cir"><input type="number" id="q-lp" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-lp">₹0</span></div></div></div>
+        <div class="cc" id="cc-icd"><div class="ci" style="background:#4e342e">🫀</div><div><div class="cn">ICD / Chest Drain</div><div class="cr">₹3,000</div><div class="cir"><input type="number" id="q-icd" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-icd">₹0</span></div></div></div>
+        <div class="cc" id="cc-et"><div class="ci" style="background:#1a237e">🫁</div><div><div class="cn">Intubation / ET Tube</div><div class="cr">₹800</div><div class="cir"><input type="number" id="q-et" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-et">₹0</span></div></div></div>
       </div>
 
-      <!-- 5. OBG -->
-      <div class="charge-section">
-        <div class="charge-section-header" style="background:#4a235a"><span class="csh-icon">🤰</span><span class="csh-title">OBG &amp; Gynaecology</span><span class="csh-sub">Obstetrics / Maternity</span></div>
-        <div class="charges-grid">
-          <div class="charge-card" id="cc-nsvd"><div class="charge-icon" style="background:#6c3483">🤱</div><div class="charge-info"><div class="charge-name">Normal Delivery (NSVD)</div><div class="charge-rate">₹5,000 — package</div><div class="charge-input-row"><input type="checkbox" id="chk-nsvd" onchange="recalc()" style="width:auto;margin:0;padding:0"><span class="charge-unit">Include</span><span class="charge-amount" id="amt-nsvd">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-lscs"><div class="charge-icon" style="background:#b03a73">🏥</div><div class="charge-info"><div class="charge-name">C-Section (LSCS)</div><div class="charge-rate">₹25,000 — package</div><div class="charge-input-row"><input type="checkbox" id="chk-lscs" onchange="recalc()" style="width:auto;margin:0;padding:0"><span class="charge-unit">Include</span><span class="charge-amount" id="amt-lscs">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-forceps"><div class="charge-icon" style="background:#880e4f">🩻</div><div class="charge-info"><div class="charge-name">Forceps / Vacuum Delivery</div><div class="charge-rate">₹12,000 — package</div><div class="charge-input-row"><input type="checkbox" id="chk-forceps" onchange="recalc()" style="width:auto;margin:0;padding:0"><span class="charge-unit">Include</span><span class="charge-amount" id="amt-forceps">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-epis"><div class="charge-icon" style="background:#7b1fa2">✂️</div><div class="charge-info"><div class="charge-name">Episiotomy</div><div class="charge-rate">₹1,500 / procedure</div><div class="charge-input-row"><input type="number" id="qty-epis" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-epis">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-dnc"><div class="charge-icon" style="background:#ad1457">🔧</div><div class="charge-info"><div class="charge-name">D&amp;C / MTP</div><div class="charge-rate">₹6,000 / procedure</div><div class="charge-input-row"><input type="number" id="qty-dnc" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-dnc">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-anc"><div class="charge-icon" style="background:#4a148c">🩺</div><div class="charge-info"><div class="charge-name">ANC Consultation</div><div class="charge-rate">₹500 / visit</div><div class="charge-input-row"><input type="number" id="qty-anc" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">visits</span><span class="charge-amount" id="amt-anc">₹0</span></div></div></div>
-        </div>
+      <!-- OBG -->
+      <div class="cs-hdr obg"><span>🤰</span><span class="cs-title">OBG &amp; Gynaecology</span><span class="cs-sub">Obstetrics / Maternity</span></div>
+      <div class="cg">
+        <div class="cc" id="cc-nsvd"><div class="ci" style="background:#6c3483">🤱</div><div><div class="cn">Normal Delivery (NSVD)</div><div class="cr">₹5,000 package</div><div class="cir"><input type="checkbox" id="chk-nsvd" onchange="recalc()" style="width:auto"><span class="cu">Include</span><span class="ca" id="a-nsvd">₹0</span></div></div></div>
+        <div class="cc" id="cc-lscs"><div class="ci" style="background:#b03a73">🏥</div><div><div class="cn">C-Section (LSCS)</div><div class="cr">₹25,000 package</div><div class="cir"><input type="checkbox" id="chk-lscs" onchange="recalc()" style="width:auto"><span class="cu">Include</span><span class="ca" id="a-lscs">₹0</span></div></div></div>
+        <div class="cc" id="cc-forceps"><div class="ci" style="background:#880e4f">🩻</div><div><div class="cn">Forceps / Vacuum</div><div class="cr">₹12,000 package</div><div class="cir"><input type="checkbox" id="chk-forceps" onchange="recalc()" style="width:auto"><span class="cu">Include</span><span class="ca" id="a-forceps">₹0</span></div></div></div>
+        <div class="cc" id="cc-epis"><div class="ci" style="background:#7b1fa2">✂️</div><div><div class="cn">Episiotomy</div><div class="cr">₹1,500</div><div class="cir"><input type="number" id="q-epis" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-epis">₹0</span></div></div></div>
+        <div class="cc" id="cc-dnc"><div class="ci" style="background:#ad1457">🔧</div><div><div class="cn">D&amp;C / MTP</div><div class="cr">₹6,000</div><div class="cir"><input type="number" id="q-dnc" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-dnc">₹0</span></div></div></div>
+        <div class="cc" id="cc-anc"><div class="ci" style="background:#4a148c">🩺</div><div><div class="cn">ANC Consultation</div><div class="cr">₹500 / visit</div><div class="cir"><input type="number" id="q-anc" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">visits</span><span class="ca" id="a-anc">₹0</span></div></div></div>
       </div>
 
-      <!-- 6. OT -->
-      <div class="charge-section">
-        <div class="charge-section-header" style="background:#1b2631"><span class="csh-icon">🔪</span><span class="csh-title">Operation Theatre</span><span class="csh-sub">Surgery / OT / Anaesthesia</span></div>
-        <div class="charges-grid">
-          <div class="charge-card" id="cc-ot-minor"><div class="charge-icon" style="background:#2e4057">⚔️</div><div class="charge-info"><div class="charge-name">Minor OT Charge</div><div class="charge-rate">₹4,000 / procedure</div><div class="charge-input-row"><input type="number" id="qty-ot-minor" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-ot-minor">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-ot-major"><div class="charge-icon" style="background:#17202a">🏥</div><div class="charge-info"><div class="charge-name">Major OT Charge</div><div class="charge-rate">₹15,000 / procedure</div><div class="charge-input-row"><input type="number" id="qty-ot-major" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-ot-major">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-anaes-gen"><div class="charge-icon" style="background:#1c2833">😴</div><div class="charge-info"><div class="charge-name">Anaesthesia (General)</div><div class="charge-rate">₹5,000 / procedure</div><div class="charge-input-row"><input type="number" id="qty-anaes-gen" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-anaes-gen">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-anaes-spi"><div class="charge-icon" style="background:#273746">💉</div><div class="charge-info"><div class="charge-name">Anaesthesia (Spinal/Epidural)</div><div class="charge-rate">₹3,000 / procedure</div><div class="charge-input-row"><input type="number" id="qty-anaes-spi" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-anaes-spi">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-ot-cons"><div class="charge-icon" style="background:#34495e">🧤</div><div class="charge-info"><div class="charge-name">OT Consumables</div><div class="charge-rate">₹2,500 / procedure</div><div class="charge-input-row"><input type="number" id="qty-ot-cons" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-ot-cons">₹0</span></div></div></div>
-          <div class="charge-card" id="cc-surgeon"><div class="charge-icon" style="background:#2c3e50">👨‍⚕️</div><div class="charge-info"><div class="charge-name">Surgeon / Specialist Fee</div><div class="charge-rate">₹8,000 / procedure</div><div class="charge-input-row"><input type="number" id="qty-surgeon" class="charge-qty" min="0" value="0" oninput="recalc()"><span class="charge-unit">procedure</span><span class="charge-amount" id="amt-surgeon">₹0</span></div></div></div>
-        </div>
+      <!-- OT -->
+      <div class="cs-hdr ot"><span>🔪</span><span class="cs-title">Operation Theatre</span><span class="cs-sub">Surgery / Anaesthesia</span></div>
+      <div class="cg">
+        <div class="cc" id="cc-otm"><div class="ci" style="background:#2e4057">⚔️</div><div><div class="cn">Minor OT</div><div class="cr">₹4,000</div><div class="cir"><input type="number" id="q-otm" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-otm">₹0</span></div></div></div>
+        <div class="cc" id="cc-otM"><div class="ci" style="background:#17202a">🏥</div><div><div class="cn">Major OT</div><div class="cr">₹15,000</div><div class="cir"><input type="number" id="q-otM" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-otM">₹0</span></div></div></div>
+        <div class="cc" id="cc-ag"><div class="ci" style="background:#1c2833">😴</div><div><div class="cn">Anaesthesia (General)</div><div class="cr">₹5,000</div><div class="cir"><input type="number" id="q-ag" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-ag">₹0</span></div></div></div>
+        <div class="cc" id="cc-as"><div class="ci" style="background:#273746">💉</div><div><div class="cn">Anaesthesia (Spinal)</div><div class="cr">₹3,000</div><div class="cir"><input type="number" id="q-as" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-as">₹0</span></div></div></div>
+        <div class="cc" id="cc-otc"><div class="ci" style="background:#34495e">🧤</div><div><div class="cn">OT Consumables</div><div class="cr">₹2,500</div><div class="cir"><input type="number" id="q-otc" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-otc">₹0</span></div></div></div>
+        <div class="cc" id="cc-surg"><div class="ci" style="background:#2c3e50">👨‍⚕️</div><div><div class="cn">Surgeon / Specialist Fee</div><div class="cr">₹8,000</div><div class="cir"><input type="number" id="q-surg" class="cqty" min="0" value="0" oninput="recalc()"><span class="cu">proc</span><span class="ca" id="a-surg">₹0</span></div></div></div>
       </div>
 
-      <!-- 7. MISC -->
-      <div class="charge-section" style="margin-bottom:0">
-        <div class="charge-section-header" style="background:#37474f"><span class="csh-icon">➕</span><span class="csh-title">Miscellaneous</span><span class="csh-sub">Manual entry</span></div>
-        <div class="charges-grid">
-          <div class="charge-card" id="cc-misc"><div class="charge-icon" style="background:#455a64">💵</div><div class="charge-info"><div class="charge-name">Other Charges</div><div class="charge-rate">Manual ₹ amount</div><div class="charge-input-row"><input type="number" id="qty-misc" class="charge-qty" min="0" value="0" placeholder="₹" oninput="recalc()"><span class="charge-unit">₹ total</span><span class="charge-amount" id="amt-misc">₹0</span></div></div></div>
-          <div class="charge-card"><div class="charge-icon" style="background:#546e7a">📝</div><div class="charge-info"><div class="charge-name">Misc Description</div><div class="charge-rate">Label for misc charge</div><div class="charge-input-row" style="margin-top:8px"><input type="text" id="misc-label" placeholder="e.g. X-ray, USG, Lab" style="font-size:.8rem;padding:7px 10px"></div></div></div>
-        </div>
+      <!-- MISC -->
+      <div class="cs-hdr misc"><span>➕</span><span class="cs-title">Miscellaneous</span></div>
+      <div class="cg" style="margin-bottom:0">
+        <div class="cc" id="cc-misc"><div class="ci" style="background:#455a64">💵</div><div><div class="cn">Other Charges</div><div class="cr">Manual ₹ amount</div><div class="cir"><input type="number" id="q-misc" class="cqty" min="0" value="0" placeholder="₹" oninput="recalc()"><span class="cu">₹</span><span class="ca" id="a-misc">₹0</span></div></div></div>
+        <div class="cc"><div class="ci" style="background:#546e7a">📝</div><div><div class="cn">Misc Description</div><div class="cr">Label for above</div><div class="cir" style="margin-top:8px"><input id="misc-lbl" placeholder="X-ray, USG, Lab…" style="font-size:.78rem;padding:6px 10px"></div></div></div>
       </div>
     </div>
 
     <!-- PAYMENT -->
     <div class="card">
-      <div class="section-title">Payment Details</div>
-      <div class="form-grid-4">
-        <div class="form-group"><label>Discount (%)</label><input type="number" id="discount" min="0" max="100" value="0" oninput="recalc()"></div>
-        <div class="form-group"><label>Discount Reason</label><input type="text" id="disc-reason" placeholder="BPL / Staff / Referral"></div>
-        <div class="form-group"><label>Payment Mode</label><select id="pay-mode"><option>Cash</option><option>UPI</option><option>Card</option><option>Insurance</option><option>Part-payment</option><option>Cashless / PMJAY</option></select></div>
-        <div class="form-group"><label>Amount Paid (₹)</label><input type="number" id="amt-paid" min="0" value="0" oninput="recalc()"></div>
+      <div class="sec-title">Payment Details</div>
+      <div class="fg4">
+        <div class="fi"><label>Discount (%)</label><input type="number" id="discount" min="0" max="100" value="0" oninput="recalc()"></div>
+        <div class="fi"><label>Discount Reason</label><input id="disc-rsn" placeholder="BPL / Staff / Referral"></div>
+        <div class="fi"><label>Payment Mode</label><select id="pay-mode"><option>Cash</option><option>UPI</option><option>Card</option><option>Insurance</option><option>Part-payment</option><option>Cashless/PMJAY</option></select></div>
+        <div class="fi"><label>Amount Paid (₹)</label><input type="number" id="amt-paid" min="0" value="0" oninput="recalc()"></div>
       </div>
     </div>
 
     <!-- SUMMARY -->
     <div class="card">
-      <div class="flex items-center justify-between" style="margin-bottom:16px">
-        <div class="section-title" style="margin-bottom:0">Bill Summary</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="sec-title" style="margin-bottom:0">Bill Summary</div>
         <div style="text-align:right">
-          <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Net Payable</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--navy)" id="total-display">₹0</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:.83rem;color:var(--red)" id="balance-display"></div>
+          <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Net Payable</div>
+          <div class="mono" style="font-size:1.45rem;font-weight:700;color:var(--navy)" id="total-disp">₹0</div>
+          <div class="mono" style="font-size:.8rem;color:var(--red)" id="bal-disp"></div>
         </div>
       </div>
-      <table class="bill-table">
-        <thead><tr><th>Service</th><th>Qty / Units</th><th>Rate</th><th class="text-right">Amount</th></tr></thead>
-        <tbody id="bill-tbody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px">Add charges above to preview bill</td></tr></tbody>
-        <tfoot id="bill-tfoot"></tfoot>
+      <table class="tbl">
+        <thead><tr><th>Service</th><th>Qty</th><th>Rate</th><th class="tr">Amount</th></tr></thead>
+        <tbody id="bill-body"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Add charges above to preview bill</td></tr></tbody>
+        <tfoot id="bill-foot"></tfoot>
       </table>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="generateBill()">🧾 Generate &amp; Save Bill</button>
-        <button class="btn btn-teal" onclick="autofillDays()">📅 Auto-fill Days</button>
+        <button class="btn btn-teal" onclick="autoFill()">📅 Auto-fill Days</button>
         <button class="btn btn-outline" onclick="clearForm()">🗑️ Clear Form</button>
       </div>
     </div>
@@ -307,428 +334,766 @@
     <!-- RECEIPT -->
     <div id="print-area">
       <div class="receipt" id="receipt-card">
-        <div class="receipt-header">
+        <div class="rh">
           <h2>Chandrawati Hospital</h2>
           <p>Damkarabarwa, Jharkhand &nbsp;|&nbsp; Dr. Ritik Chandra MD (Paediatrics) &nbsp;|&nbsp; OBG &amp; Neonatology</p>
-          <div class="receipt-pid" id="r-pid">PID: —</div>
+          <div class="rpid" id="r-pid">PID: —</div>
         </div>
-        <div class="receipt-body">
-          <div class="receipt-info-grid" id="r-info"></div>
-          <hr class="receipt-divider">
-          <table class="bill-table">
-            <thead><tr><th>Service</th><th>Qty</th><th>Rate</th><th class="text-right">Amount</th></tr></thead>
-            <tbody id="r-tbody"></tbody>
+        <div class="rb">
+          <div class="rig" id="r-info"></div>
+          <hr class="rdiv">
+          <table class="tbl">
+            <thead><tr><th>Service</th><th>Qty</th><th>Rate</th><th class="tr">Amount</th></tr></thead>
+            <tbody id="r-body"></tbody>
           </table>
-          <div class="receipt-total-box">
-            <div>
-              <div class="receipt-total-label">Net Payable Amount</div>
-              <div style="font-size:.74rem;color:#8fa6bf;margin-top:2px" id="r-paymode"></div>
-            </div>
-            <div class="receipt-total-amount" id="r-total">₹0</div>
+          <div class="rtotal">
+            <div><div class="rtotal-lbl">Net Payable Amount</div><div style="font-size:.72rem;color:#8fa6bf;margin-top:2px" id="r-paymode"></div></div>
+            <div class="rtotal-amt" id="r-total">₹0</div>
           </div>
-          <div id="r-balance-box" style="background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:11px 18px;margin-top:11px;display:none;justify-content:space-between;align-items:center">
-            <span style="font-size:.8rem;color:#856404;font-weight:600">Balance Due</span>
-            <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#856404" id="r-balance">₹0</span>
-          </div>
+          <div class="rbal" id="r-bal-box"><span style="font-size:.78rem;color:#856404;font-weight:600">Balance Due</span><span class="mono" style="font-weight:700;color:#856404" id="r-bal">₹0</span></div>
         </div>
-        <div class="receipt-footer">Chandrawati Hospital, Damkarabarwa, Jharkhand &nbsp;|&nbsp; Dr. Ritik Chandra MD (Paediatrics)</div>
+        <div class="rf">Chandrawati Hospital, Damkarabarwa, Jharkhand &nbsp;|&nbsp; Dr. Ritik Chandra MD (Paediatrics)</div>
       </div>
-      <div class="btn-row" id="print-btn-row" style="display:none;justify-content:center;margin-top:14px">
+      <div class="btn-row" id="print-row" style="display:none;justify-content:center;margin-top:12px">
         <button class="btn btn-primary" onclick="window.print()">🖨️ Print Receipt</button>
         <button class="btn btn-outline" onclick="hideReceipt()">✕ Close</button>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════ TAB: PATIENTS ═══════════ -->
+  <!-- ═══ TAB: PATIENTS ═══ -->
   <div class="tab-panel" id="tab-patients">
     <div class="card">
-      <div class="flex items-center justify-between" style="margin-bottom:16px;flex-wrap:wrap;gap:10px">
-        <div class="section-title" style="margin-bottom:0">Patient Records</div>
-        <div class="flex gap-8" style="flex-wrap:wrap">
-          <input type="text" id="search-box" placeholder="Search by name or PID…" style="width:200px" oninput="renderPatientTable()">
-          <button class="btn btn-outline btn-sm" onclick="exportCSV()">📤 Export CSV</button>
-          <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑️ Clear All</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div class="sec-title" style="margin-bottom:0">Patient Records <span id="week-notice" style="font-size:.72rem;color:var(--muted);font-weight:400;margin-left:8px"></span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="search-box" placeholder="Search name or PID…" style="width:190px" oninput="renderTable()">
+          <button class="btn btn-outline btn-sm" onclick="exportCSV()">📤 CSV</button>
         </div>
       </div>
       <div style="overflow-x:auto">
-        <table class="patient-table">
-          <thead><tr><th>Patient ID</th><th>Name</th><th>Age/Sex</th><th>Ward</th><th>Admission</th><th>Diagnosis</th><th>Total</th><th>Paid</th><th>Balance</th><th>Actions</th></tr></thead>
-          <tbody id="patient-tbody"><tr><td colspan="10" style="text-align:center;color:var(--muted);padding:22px">No patient records yet.</td></tr></tbody>
+        <table class="tbl">
+          <thead><tr><th>PID</th><th>Name</th><th>Age/Sex</th><th>Ward</th><th>Admission</th><th>Diagnosis</th><th>Total</th><th>Paid</th><th>Balance</th><th>Actions</th></tr></thead>
+          <tbody id="pt-body"><tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px">No records.</td></tr></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════ TAB: RATE CARD ═══════════ -->
+  <!-- ═══ TAB: RATE CARD ═══ -->
   <div class="tab-panel" id="tab-rate-card">
     <div class="card">
-      <div class="section-title">Official Rate Card — Chandrawati Hospital</div>
-      <table class="bill-table">
-        <thead><tr><th>Service</th><th>Unit</th><th class="text-right">Charge (₹)</th></tr></thead>
+      <div class="sec-title">Official Rate Card — Chandrawati Hospital</div>
+      <table class="tbl">
+        <thead><tr><th>Service</th><th>Unit</th><th class="tr">₹</th></tr></thead>
         <tbody>
           <tr><td colspan="3" class="rc-cat">Registration &amp; Bed</td></tr>
-          <tr><td>Registration Fee</td><td>One-time</td><td class="text-right text-mono">200</td></tr>
-          <tr><td>NICU / PICU Bed</td><td>Per day</td><td class="text-right text-mono">1,500</td></tr>
-          <tr><td>General Ward Bed</td><td>Per day</td><td class="text-right text-mono">800</td></tr>
-          <tr><td>Private Cabin</td><td>Per day</td><td class="text-right text-mono">1,500</td></tr>
-          <tr><td>Doctor's Visit</td><td>Per day</td><td class="text-right text-mono">400</td></tr>
+          <tr><td>Registration Fee</td><td>One-time</td><td class="tr mono">200</td></tr>
+          <tr><td>NICU / PICU Bed</td><td>Per day</td><td class="tr mono">1,500</td></tr>
+          <tr><td>General Ward Bed</td><td>Per day</td><td class="tr mono">800</td></tr>
+          <tr><td>Private Cabin</td><td>Per day</td><td class="tr mono">1,500</td></tr>
+          <tr><td>Doctor's Visit</td><td>Per day</td><td class="tr mono">400</td></tr>
           <tr><td colspan="3" class="rc-cat">Respiratory Support</td></tr>
-          <tr><td>Oxygen Therapy</td><td>Per hour</td><td class="text-right text-mono">60</td></tr>
-          <tr><td>CPAP / BiPAP</td><td>Per day</td><td class="text-right text-mono">1,500</td></tr>
-          <tr><td>Ventilator (disables oxygen charge)</td><td>Per day</td><td class="text-right text-mono">3,000</td></tr>
-          <tr><td>Monitor / Pulse Oximetry</td><td>Per hour</td><td class="text-right text-mono">25</td></tr>
+          <tr><td>Oxygen Therapy</td><td>Per hour</td><td class="tr mono">60</td></tr>
+          <tr><td>CPAP / BiPAP</td><td>Per day</td><td class="tr mono">1,500</td></tr>
+          <tr><td>Ventilator</td><td>Per day</td><td class="tr mono">3,000</td></tr>
+          <tr><td>Monitor / Pulse Ox</td><td>Per hour</td><td class="tr mono">25</td></tr>
           <tr><td colspan="3" class="rc-cat">Consumables &amp; Infusion</td></tr>
-          <tr><td>Consumables Pack (cannula, gloves, IV sets, syringes)</td><td>Per day</td><td class="text-right text-mono">350</td></tr>
-          <tr><td>Infusion Pump</td><td>Per day</td><td class="text-right text-mono">200</td></tr>
-          <tr><td>Syringe Pump</td><td>Per day</td><td class="text-right text-mono">150</td></tr>
-          <tr><td>Nebulization</td><td>Per session</td><td class="text-right text-mono">80</td></tr>
+          <tr><td>Consumables Pack</td><td>Per day</td><td class="tr mono">350</td></tr>
+          <tr><td>Infusion Pump</td><td>Per day</td><td class="tr mono">200</td></tr>
+          <tr><td>Syringe Pump</td><td>Per day</td><td class="tr mono">150</td></tr>
+          <tr><td>Nebulization</td><td>Per session</td><td class="tr mono">80</td></tr>
           <tr><td colspan="3" class="rc-cat">Neonatal &amp; Paediatric Procedures</td></tr>
-          <tr><td>PICC Line Insertion</td><td>Per procedure</td><td class="text-right text-mono">4,000</td></tr>
-          <tr><td>Umbilical Line (UAC / UVC)</td><td>Per procedure</td><td class="text-right text-mono">2,500</td></tr>
-          <tr><td>Phototherapy</td><td>Per day</td><td class="text-right text-mono">500</td></tr>
-          <tr><td>Lumbar Puncture</td><td>Per procedure</td><td class="text-right text-mono">1,500</td></tr>
-          <tr><td>ICD / Chest Drain</td><td>Per procedure</td><td class="text-right text-mono">3,000</td></tr>
-          <tr><td>Intubation / ET Tube</td><td>Per procedure</td><td class="text-right text-mono">800</td></tr>
+          <tr><td>PICC Line</td><td>Per procedure</td><td class="tr mono">4,000</td></tr>
+          <tr><td>Umbilical Line (UAC/UVC)</td><td>Per procedure</td><td class="tr mono">2,500</td></tr>
+          <tr><td>Phototherapy</td><td>Per day</td><td class="tr mono">500</td></tr>
+          <tr><td>Lumbar Puncture</td><td>Per procedure</td><td class="tr mono">1,500</td></tr>
+          <tr><td>ICD / Chest Drain</td><td>Per procedure</td><td class="tr mono">3,000</td></tr>
+          <tr><td>Intubation / ET Tube</td><td>Per procedure</td><td class="tr mono">800</td></tr>
           <tr><td colspan="3" class="rc-cat">OBG &amp; Gynaecology</td></tr>
-          <tr><td>Normal Delivery (NSVD)</td><td>Package</td><td class="text-right text-mono">5,000</td></tr>
-          <tr><td>C-Section (LSCS)</td><td>Package</td><td class="text-right text-mono">25,000</td></tr>
-          <tr><td>Forceps / Vacuum Delivery</td><td>Package</td><td class="text-right text-mono">12,000</td></tr>
-          <tr><td>Episiotomy</td><td>Per procedure</td><td class="text-right text-mono">1,500</td></tr>
-          <tr><td>D&amp;C / MTP</td><td>Per procedure</td><td class="text-right text-mono">6,000</td></tr>
-          <tr><td>ANC Consultation</td><td>Per visit</td><td class="text-right text-mono">500</td></tr>
+          <tr><td>Normal Delivery (NSVD)</td><td>Package</td><td class="tr mono">5,000</td></tr>
+          <tr><td>C-Section (LSCS)</td><td>Package</td><td class="tr mono">25,000</td></tr>
+          <tr><td>Forceps / Vacuum</td><td>Package</td><td class="tr mono">12,000</td></tr>
+          <tr><td>Episiotomy</td><td>Per procedure</td><td class="tr mono">1,500</td></tr>
+          <tr><td>D&amp;C / MTP</td><td>Per procedure</td><td class="tr mono">6,000</td></tr>
+          <tr><td>ANC Consultation</td><td>Per visit</td><td class="tr mono">500</td></tr>
           <tr><td colspan="3" class="rc-cat">Operation Theatre</td></tr>
-          <tr><td>Minor OT</td><td>Per procedure</td><td class="text-right text-mono">4,000</td></tr>
-          <tr><td>Major OT</td><td>Per procedure</td><td class="text-right text-mono">15,000</td></tr>
-          <tr><td>Anaesthesia (General)</td><td>Per procedure</td><td class="text-right text-mono">5,000</td></tr>
-          <tr><td>Anaesthesia (Spinal / Epidural)</td><td>Per procedure</td><td class="text-right text-mono">3,000</td></tr>
-          <tr><td>OT Consumables</td><td>Per procedure</td><td class="text-right text-mono">2,500</td></tr>
-          <tr><td>Surgeon / Specialist Fee</td><td>Per procedure</td><td class="text-right text-mono">8,000</td></tr>
+          <tr><td>Minor OT</td><td>Per procedure</td><td class="tr mono">4,000</td></tr>
+          <tr><td>Major OT</td><td>Per procedure</td><td class="tr mono">15,000</td></tr>
+          <tr><td>Anaesthesia (General)</td><td>Per procedure</td><td class="tr mono">5,000</td></tr>
+          <tr><td>Anaesthesia (Spinal/Epidural)</td><td>Per procedure</td><td class="tr mono">3,000</td></tr>
+          <tr><td>OT Consumables</td><td>Per procedure</td><td class="tr mono">2,500</td></tr>
+          <tr><td>Surgeon / Specialist Fee</td><td>Per procedure</td><td class="tr mono">8,000</td></tr>
         </tbody>
       </table>
-      <p style="margin-top:13px;font-size:.73rem;color:var(--muted)">* Rates effective 2025. Tier-3 city pricing, Jharkhand. Discounts applicable for BPL / PMJAY / government referral. GST as applicable on non-clinical services.</p>
+      <p style="margin-top:12px;font-size:.72rem;color:var(--muted)">* Rates effective 2025. Tier-3 Jharkhand pricing. PMJAY / BPL discounts applicable.</p>
     </div>
   </div>
+
+  <!-- ═══ TAB: ADMIN ═══ -->
+  <div class="tab-panel" id="tab-admin">
+    <div class="admin-hdr">
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:1.2rem;margin-bottom:3px">Admin Dashboard</div>
+        <div style="font-size:.78rem;color:#8fa6bf">Full access — all patient records, all time</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span class="admin-badge">🔐 ADMIN</span>
+        <div id="a-total-rev" style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:#1aaa91"></div>
+      </div>
+    </div>
+
+    <!-- Admin Stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      <div class="stat"><div class="stat-lbl">All-time Patients</div><div class="stat-val" id="a-stat-total">0</div></div>
+      <div class="stat"><div class="stat-lbl">Total Billed</div><div class="stat-val" id="a-stat-billed">₹0</div></div>
+      <div class="stat"><div class="stat-lbl">Total Collected</div><div class="stat-val" id="a-stat-collected">₹0</div></div>
+      <div class="stat"><div class="stat-lbl">Outstanding</div><div class="stat-val" id="a-stat-out" style="color:var(--red)">₹0</div></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div class="sec-title" style="margin-bottom:0">All Patient Records</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="a-search" placeholder="Search…" style="width:180px" oninput="renderAdminTable()">
+          <select id="a-filter-ward" onchange="renderAdminTable()" style="width:130px"><option value="">All Wards</option><option value="nicu">NICU</option><option value="picu">PICU</option><option value="ward">General Ward</option><option value="pvt">Private Cabin</option><option value="obg">OBG</option></select>
+          <button class="btn btn-outline btn-sm" onclick="exportAdminCSV()">📤 Export All</button>
+          <button class="btn btn-danger btn-sm" onclick="adminClearAll()">🗑️ Clear All</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>PID</th><th>Name</th><th>Age/Sex</th><th>Ward</th><th>Admission</th><th>Discharge</th><th>Diagnosis</th><th>Total</th><th>Paid</th><th>Balance</th><th>Mode</th><th>Actions</th></tr></thead>
+          <tbody id="admin-body"><tr><td colspan="12" style="text-align:center;color:var(--muted);padding:20px">No records.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </div>
 <div id="toast"></div>
 
-<!-- Sync Status Badge -->
-<div id="sync-badge" style="position:fixed;top:82px;right:16px;z-index:90;background:#0f2d4a;color:white;padding:6px 14px;border-radius:20px;font-size:.72rem;font-weight:600;display:flex;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(0,0,0,0.2)">
-  <span id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:#ffc107;display:inline-block;transition:background .3s"></span>
-  <span id="sync-text">Connecting…</span>
-</div>
-
 <script>
-// ── FIREBASE REST API (no SDK needed) ─────────────────────────────────────
-const FB = 'https://ipd-billing-default-rtdb.asia-southeast1.firebasedatabase.app';
-const APP_PASS = 'chandrawati2025'; // ← change this password
-let patients = [];
-let billCount = 0;
-let totalRevenue = 0;
-let pollTimer = null;
+// ════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════
+const FB = "https://ipd-billing-default-rtdb.asia-southeast1.firebasedatabase.app";
+const ROLES = {
+  reception: "reception123",
+  admin:     "admin@chw2025"
+};
 
-// ── LOGIN ──────────────────────────────────────────────────────────────────
-function doLogin(){
-  const p=document.getElementById('login-pass').value;
-  if(p===APP_PASS){
-    localStorage.setItem('chw_auth','1');
-    document.getElementById('login-screen').style.display='none';
-    startApp();
-  }else{
-    document.getElementById('login-err').style.display='block';
-    document.getElementById('login-pass').value='';
-    document.getElementById('login-pass').focus();
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let allPatients = [];
+let currentRole = null;
+let pollTimer   = null;
+let selectedRole = "reception";
+
+// ════════════════════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════════════════════
+function selRole(el, role) {
+  selectedRole = role;
+  document.querySelectorAll(".lrole").forEach(r => r.classList.remove("sel"));
+  el.classList.add("sel");
+}
+
+function doLogin() {
+  const pass = document.getElementById("login-pass").value;
+  const err  = document.getElementById("lerr");
+  if (pass === ROLES[selectedRole]) {
+    currentRole = selectedRole;
+    localStorage.setItem("chw_role", currentRole);
+    document.getElementById("login-wrap").style.display = "none";
+    bootApp();
+  } else {
+    err.style.display = "block";
+    document.getElementById("login-pass").value = "";
+    document.getElementById("login-pass").focus();
+    setTimeout(() => { err.style.display = "none"; }, 3000);
   }
 }
 
-function checkLogin(){
-  if(localStorage.getItem('chw_auth')==='1'){
-    document.getElementById('login-screen').style.display='none';
-    startApp();
+function checkSession() {
+  const saved = localStorage.getItem("chw_role");
+  if (saved && ROLES[saved] !== undefined) {
+    currentRole = saved;
+    document.getElementById("login-wrap").style.display = "none";
+    bootApp();
   }
-  // else login screen stays visible
 }
 
-function logout(){
-  localStorage.removeItem('chw_auth');
+function doLogout() {
+  clearInterval(pollTimer);
+  localStorage.removeItem("chw_role");
   location.reload();
 }
 
-function setSyncBadge(state){
-  const dot=document.getElementById('sync-dot');
-  const txt=document.getElementById('sync-text');
-  const map={connecting:{c:'#ffc107',t:'Connecting…'},online:{c:'#1aaa91',t:'Synced ✓'},offline:{c:'#e74c3c',t:'Offline'},saving:{c:'#1565c0',t:'Saving…'}};
-  const s=map[state]||map.offline;
-  dot.style.background=s.c; txt.textContent=s.t;
+// ════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════
+function bootApp() {
+  document.getElementById("user-badge").textContent =
+    currentRole === "admin" ? "🔐 Admin" : "🖥️ Reception";
+  if (currentRole === "admin") {
+    document.getElementById("admin-tab").style.display = "flex";
+  }
+  document.getElementById("p-admit").value = todayStr();
+  document.getElementById("week-notice").textContent =
+    currentRole === "reception" ? "(Showing last 7 days)" : "";
+  updateStats(); renderTable();
+  loadFromFirebase();
+  pollTimer = setInterval(loadFromFirebase, 8000);
 }
 
-async function fbFetch(path,method='GET',body=null){
-  const opts={method,headers:{'Content-Type':'application/json'}};
-  if(body)opts.body=JSON.stringify(body);
-  const r=await fetch(FB+path+'.json',opts);
-  if(!r.ok)throw new Error('HTTP '+r.status);
+// ════════════════════════════════════════════════════════
+// FIREBASE REST
+// ════════════════════════════════════════════════════════
+function setSyncBadge(state) {
+  const colors = { connecting:"#ffc107", online:"#1aaa91", offline:"#e74c3c", saving:"#1565c0" };
+  const labels = { connecting:"Connecting…", online:"Synced ✓", offline:"Offline", saving:"Saving…" };
+  document.getElementById("sync-dot").style.background = colors[state] || colors.offline;
+  document.getElementById("sync-txt").textContent = labels[state] || "Offline";
+}
+
+async function fbReq(path, method, body) {
+  const url = FB + path + ".json";
+  const opt = { method: method || "GET", headers: { "Content-Type": "application/json" } };
+  if (body !== undefined) opt.body = JSON.stringify(body);
+  const r = await fetch(url, opt);
+  if (!r.ok) throw new Error("HTTP " + r.status);
   return r.json();
 }
 
-async function fbLoad(){
-  try{
-    const data=await fbFetch('/chw/patients');
-    patients=data?Object.values(data).sort((a,b)=>(b.ts||0)-(a.ts||0)):[];
-    billCount=patients.length;
-    totalRevenue=patients.reduce((s,p)=>s+(p.total||0),0);
-    updateStats();renderPatientTable();
-    setSyncBadge('online');
-  }catch(e){setSyncBadge('offline')}
-}
-
-async function fbSaveRecord(record){
-  setSyncBadge('saving');
-  try{
-    const key=record.pid.replace(/[^a-zA-Z0-9_-]/g,'_');
-    await fbFetch('/chw/patients/'+key,'PUT',{...record,ts:Date.now()});
-    setSyncBadge('online');
-    await fbLoad();
-  }catch(e){
-    // fallback: store locally if offline
-    patients.unshift(record);billCount++;totalRevenue+=record.total;
-    localStorage.setItem('chw_offline',JSON.stringify({patients,billCount,totalRevenue}));
-    updateStats();renderPatientTable();
-    setSyncBadge('offline');
-    toast('Saved locally (offline)');
+async function loadFromFirebase() {
+  try {
+    const data = await fbReq("/chw/patients", "GET");
+    allPatients = data
+      ? Object.values(data).sort((a, b) => (b.ts || 0) - (a.ts || 0))
+      : [];
+    setSyncBadge("online");
+    updateStats();
+    renderTable();
+    if (currentRole === "admin") renderAdminTable();
+  } catch (e) {
+    setSyncBadge("offline");
   }
 }
 
-async function fbDeleteRecord(pid){
-  try{
-    const key=pid.replace(/[^a-zA-Z0-9_-]/g,'_');
-    await fbFetch('/chw/patients/'+key,'DELETE');
-    await fbLoad();
-  }catch(e){
-    patients=patients.filter(p=>p.pid!==pid);
-    updateStats();renderPatientTable();
+async function fbSave(record) {
+  setSyncBadge("saving");
+  try {
+    const key = record.pid.replace(/[^a-zA-Z0-9_-]/g, "_");
+    await fbReq("/chw/patients/" + key, "PUT", { ...record, ts: Date.now() });
+    setSyncBadge("online");
+    await loadFromFirebase();
+    toast("✅ Bill saved & synced");
+  } catch (e) {
+    setSyncBadge("offline");
+    toast("⚠️ Could not sync — check internet");
   }
 }
 
-async function fbClearAll(){
-  try{
-    await fbFetch('/chw/patients','DELETE');
-    patients=[];billCount=0;totalRevenue=0;
-    updateStats();renderPatientTable();
-  }catch(e){toast('Clear failed: '+e.message)}
+async function fbDelete(pid) {
+  try {
+    const key = pid.replace(/[^a-zA-Z0-9_-]/g, "_");
+    await fbReq("/chw/patients/" + key, "DELETE");
+    await loadFromFirebase();
+    toast("Deleted");
+  } catch (e) { toast("Delete failed"); }
 }
 
-function startPolling(){
-  fbLoad();
-  pollTimer=setInterval(fbLoad,8000);
+async function fbClear() {
+  try {
+    await fbReq("/chw/patients", "DELETE");
+    allPatients = [];
+    updateStats(); renderTable(); renderAdminTable();
+    toast("All records cleared");
+  } catch (e) { toast("Clear failed: " + e.message); }
 }
 
-// ── CLOCK ──────────────────────────────────────────────────────────────────
-function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true})}
-setInterval(updateClock,1000);updateClock();
-
-function generatePID(){const d=new Date(),yy=String(d.getFullYear()).slice(-2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0'),seq=String(patients.length+1).padStart(4,'0');return`CHW-${yy}${mm}${dd}-${seq}`}
-
-function startApp(){
-  document.getElementById('p-admit').value=new Date().toISOString().split('T')[0];
-  document.getElementById('pid-display').textContent='CHW-—';
-  updateStats();renderPatientTable();
-  startPolling();
+// ════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════
+function todayStr() { return new Date().toISOString().split("T")[0]; }
+function fmt(n) { return (n || 0).toLocaleString("en-IN"); }
+function generatePID() {
+  const d = new Date(), yy = String(d.getFullYear()).slice(-2),
+    mm = String(d.getMonth() + 1).padStart(2, "0"),
+    dd = String(d.getDate()).padStart(2, "0"),
+    seq = String(allPatients.length + 1).padStart(4, "0");
+  return "CHW-" + yy + mm + dd + "-" + seq;
+}
+function visiblePatients() {
+  if (currentRole === "admin") return allPatients;
+  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  return allPatients.filter(p => (p.ts || 0) >= cutoff);
 }
 
-function init(){
-  checkLogin();
+// ════════════════════════════════════════════════════════
+// RATES & CALC
+// ════════════════════════════════════════════════════════
+const R = {
+  reg:200, nicu:1500, ward:800, pvt:1500, doc:400,
+  oxy:60, cpap:1500, vent:3000, mon:25,
+  cons:350, inf:200, syr:150, neb:80,
+  picc:4000, uvc:2500, photo:500, lp:1500, icd:3000, et:800,
+  nsvd:5000, lscs:25000, forceps:12000, epis:1500, dnc:6000, anc:500,
+  otm:4000, otM:15000, ag:5000, as:3000, otc:2500, surg:8000, misc:1
+};
+
+function gq(id) { return parseInt(document.getElementById("q-" + id)?.value) || 0; }
+function gc(id) { return document.getElementById("chk-" + id)?.checked ? 1 : 0; }
+
+function getVals() {
+  return {
+    reg: gc("reg") * R.reg,
+    nicu: gq("nicu") * R.nicu, ward: gq("ward") * R.ward,
+    pvt: gq("pvt") * R.pvt,   doc: gq("doc") * R.doc,
+    oxy: gq("oxy") * R.oxy,   cpap: gq("cpap") * R.cpap,
+    vent: gq("vent") * R.vent, mon: gq("mon") * R.mon,
+    cons: gq("cons") * R.cons, inf: gq("inf") * R.inf,
+    syr: gq("syr") * R.syr,   neb: gq("neb") * R.neb,
+    picc: gq("picc") * R.picc, uvc: gq("uvc") * R.uvc,
+    photo: gq("photo") * R.photo, lp: gq("lp") * R.lp,
+    icd: gq("icd") * R.icd, et: gq("et") * R.et,
+    nsvd: gc("nsvd") * R.nsvd, lscs: gc("lscs") * R.lscs,
+    forceps: gc("forceps") * R.forceps,
+    epis: gq("epis") * R.epis, dnc: gq("dnc") * R.dnc, anc: gq("anc") * R.anc,
+    otm: gq("otm") * R.otm, otM: gq("otM") * R.otM,
+    ag: gq("ag") * R.ag, as: gq("as") * R.as,
+    otc: gq("otc") * R.otc, surg: gq("surg") * R.surg,
+    misc: gq("misc")
+  };
 }
-init();
 
-function switchTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active')}
+function buildRows(v, q) {
+  const s = [
+    { lbl: "Registration & Bed", rows: [
+        v.reg    && ["Registration Fee", "1", "₹200", v.reg],
+        v.nicu   && ["NICU/PICU Bed", (q.nicu||0)+" days", "₹1,500/day", v.nicu],
+        v.ward   && ["General Ward Bed", (q.ward||0)+" days", "₹800/day", v.ward],
+        v.pvt    && ["Private Cabin", (q.pvt||0)+" days", "₹1,500/day", v.pvt],
+        v.doc    && ["Doctor's Visit", (q.doc||0)+" days", "₹400/day", v.doc]
+    ]},
+    { lbl: "Respiratory Support", rows: [
+        v.oxy   && ["Oxygen Therapy", (q.oxy||0)+" hrs", "₹60/hr", v.oxy],
+        v.cpap  && ["CPAP/BiPAP", (q.cpap||0)+" days", "₹1,500/day", v.cpap],
+        v.vent  && ["Ventilator", (q.vent||0)+" days", "₹3,000/day", v.vent],
+        v.mon   && ["Monitor/Pulse Ox", (q.mon||0)+" hrs", "₹25/hr", v.mon]
+    ]},
+    { lbl: "Consumables & Infusion", rows: [
+        v.cons && ["Consumables Pack", (q.cons||0)+" days", "₹350/day", v.cons],
+        v.inf  && ["Infusion Pump", (q.inf||0)+" days", "₹200/day", v.inf],
+        v.syr  && ["Syringe Pump", (q.syr||0)+" days", "₹150/day", v.syr],
+        v.neb  && ["Nebulization", (q.neb||0)+" sessions", "₹80/session", v.neb]
+    ]},
+    { lbl: "Neonatal & Paediatric Procedures", rows: [
+        v.picc  && ["PICC Line", q.picc||0, "₹4,000", v.picc],
+        v.uvc   && ["Umbilical Line", q.uvc||0, "₹2,500", v.uvc],
+        v.photo && ["Phototherapy", (q.photo||0)+" days", "₹500/day", v.photo],
+        v.lp    && ["Lumbar Puncture", q.lp||0, "₹1,500", v.lp],
+        v.icd   && ["ICD/Chest Drain", q.icd||0, "₹3,000", v.icd],
+        v.et    && ["Intubation/ET Tube", q.et||0, "₹800", v.et]
+    ]},
+    { lbl: "OBG & Gynaecology", rows: [
+        v.nsvd    && ["Normal Delivery (NSVD)", "1", "₹5,000", v.nsvd],
+        v.lscs    && ["C-Section (LSCS)", "1", "₹25,000", v.lscs],
+        v.forceps && ["Forceps/Vacuum", "1", "₹12,000", v.forceps],
+        v.epis    && ["Episiotomy", q.epis||0, "₹1,500", v.epis],
+        v.dnc     && ["D&C / MTP", q.dnc||0, "₹6,000", v.dnc],
+        v.anc     && ["ANC Consultation", (q.anc||0)+" visits", "₹500/visit", v.anc]
+    ]},
+    { lbl: "Operation Theatre", rows: [
+        v.otm  && ["Minor OT", q.otm||0, "₹4,000", v.otm],
+        v.otM  && ["Major OT", q.otM||0, "₹15,000", v.otM],
+        v.ag   && ["Anaesthesia (General)", q.ag||0, "₹5,000", v.ag],
+        v.as   && ["Anaesthesia (Spinal)", q.as||0, "₹3,000", v.as],
+        v.otc  && ["OT Consumables", q.otc||0, "₹2,500", v.otc],
+        v.surg && ["Surgeon/Specialist Fee", q.surg||0, "₹8,000", v.surg]
+    ]},
+    { lbl: "Miscellaneous", rows: [
+        v.misc && [document.getElementById("misc-lbl")?.value || "Miscellaneous", "—", "—", v.misc]
+    ]}
+  ];
+  let html = "";
+  s.forEach(sec => {
+    const rows = sec.rows.filter(Boolean);
+    if (!rows.length) return;
+    html += `<tr class="tbl-sec"><td colspan="4">${sec.lbl}</td></tr>`;
+    rows.forEach(r => {
+      html += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="tr mono">₹${fmt(r[3])}</td></tr>`;
+    });
+  });
+  return html;
+}
 
-const R={reg:200,nicu:1500,ward:800,pvt:1500,doc:400,oxy:60,cpap:1500,vent:3000,mon:25,cons:350,inf:200,syr:150,neb:80,picc:4000,uvc:2500,photo:500,lp:1500,icd:3000,et:800,nsvd:5000,lscs:25000,epis:1500,dnc:6000,forceps:12000,anc:500,'ot-minor':4000,'ot-major':15000,'anaes-gen':5000,'anaes-spi':3000,'ot-cons':2500,surgeon:8000,misc:1};
+function recalc() {
+  const v = getVals();
+  Object.keys(v).forEach(k => {
+    const el = document.getElementById("a-" + k);
+    if (el) el.textContent = v[k] ? "₹" + fmt(v[k]) : "₹0";
+    const cc = document.getElementById("cc-" + k);
+    if (cc) cc.classList.toggle("on", v[k] > 0);
+  });
+  const disc     = parseFloat(document.getElementById("discount").value) || 0;
+  const subtotal = Object.values(v).reduce((a, b) => a + b, 0);
+  const discAmt  = Math.round(subtotal * disc / 100);
+  const total    = subtotal - discAmt;
+  const paid     = parseInt(document.getElementById("amt-paid").value) || 0;
+  const balance  = total - paid;
 
-function ventCheck(){
-  const v=parseInt(document.getElementById('qty-vent').value)||0;
-  const oi=document.getElementById('qty-oxy'),oc=document.getElementById('cc-oxy'),w=document.getElementById('vent-warning');
-  if(v>0){oi.value=0;oi.disabled=true;oc.classList.add('disabled-charge');w.classList.add('show')}
-  else{oi.disabled=false;oc.classList.remove('disabled-charge');w.classList.remove('show')}
+  document.getElementById("total-disp").textContent = "₹" + fmt(total);
+  document.getElementById("bal-disp").textContent = balance > 0 ? "Balance: ₹" + fmt(balance) : "";
+  document.getElementById("pid-display").textContent = generatePID();
+
+  const q = {};
+  ["nicu","ward","pvt","doc","oxy","cpap","vent","mon","cons","inf","syr","neb",
+   "picc","uvc","photo","lp","icd","et","epis","dnc","anc","otm","otM","ag","as","otc","surg","misc"]
+    .forEach(k => q[k] = gq(k));
+
+  const rows = buildRows(v, q);
+  const body = document.getElementById("bill-body");
+  const foot = document.getElementById("bill-foot");
+  if (!rows) {
+    body.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Add charges above to preview bill</td></tr>`;
+    foot.innerHTML = ""; return;
+  }
+  body.innerHTML = rows;
+  let f = `<tr><td colspan="3" style="text-align:right;padding:8px 12px;font-size:.78rem;color:var(--muted)">Subtotal</td><td class="tr mono" style="padding:8px 12px">₹${fmt(subtotal)}</td></tr>`;
+  if (discAmt) f += `<tr><td colspan="3" style="text-align:right;padding:4px 12px;font-size:.78rem;color:var(--red)">Discount (${disc}%)</td><td class="tr mono" style="padding:4px 12px;color:var(--red)">−₹${fmt(discAmt)}</td></tr>`;
+  f += `<tr class="tbl-total"><td colspan="3" style="padding:11px 12px">NET PAYABLE</td><td class="tr mono" style="padding:11px 12px;font-size:1rem">₹${fmt(total)}</td></tr>`;
+  if (paid > 0) f += `<tr><td colspan="3" style="text-align:right;padding:4px 12px;font-size:.78rem;color:var(--green)">Amount Paid</td><td class="tr mono" style="padding:4px 12px;color:var(--green)">₹${fmt(paid)}</td></tr>`;
+  if (balance > 0) f += `<tr><td colspan="3" style="text-align:right;padding:4px 12px;font-size:.78rem;color:var(--red);font-weight:700">Balance Due</td><td class="tr mono" style="padding:4px 12px;color:var(--red);font-weight:700">₹${fmt(balance)}</td></tr>`;
+  foot.innerHTML = f;
+}
+
+// ════════════════════════════════════════════════════════
+// VENTILATOR LOGIC
+// ════════════════════════════════════════════════════════
+function ventChk() {
+  const v = parseInt(document.getElementById("q-vent").value) || 0;
+  const oi = document.getElementById("q-oxy");
+  const oc = document.getElementById("cc-oxy");
+  const w  = document.getElementById("vw");
+  if (v > 0) { oi.value = 0; oi.disabled = true; oc.classList.add("disabled"); w.classList.add("show"); }
+  else { oi.disabled = false; oc.classList.remove("disabled"); w.classList.remove("show"); }
   recalc();
 }
 
-function autofillDays(){
-  const a=document.getElementById('p-admit').value,d=document.getElementById('p-discharge').value;
-  if(!a||!d){toast('Set admission and discharge dates first');return}
-  const days=Math.max(1,Math.round((new Date(d)-new Date(a))/86400000));
-  const ward=document.getElementById('p-ward').value;
-  if(ward==='nicu'||ward==='picu')document.getElementById('qty-nicu').value=days;
-  else if(ward==='ward')document.getElementById('qty-ward').value=days;
-  else if(ward==='pvt')document.getElementById('qty-pvt').value=days;
-  document.getElementById('qty-doc').value=days;
-  document.getElementById('qty-cons').value=days;
-  recalc();toast('Auto-filled '+days+' day(s)');
-}
-function autoSelectWard(){['nicu','ward','pvt'].forEach(w=>document.getElementById('qty-'+w).value=0);recalc()}
-
-function gq(id){return parseInt(document.getElementById('qty-'+id)?.value)||0}
-function gc(id){return document.getElementById('chk-'+id)?.checked?1:0}
-
-function getVals(){return{reg:gc('reg')*R.reg,nicu:gq('nicu')*R.nicu,ward:gq('ward')*R.ward,pvt:gq('pvt')*R.pvt,doc:gq('doc')*R.doc,oxy:gq('oxy')*R.oxy,cpap:gq('cpap')*R.cpap,vent:gq('vent')*R.vent,mon:gq('mon')*R.mon,cons:gq('cons')*R.cons,inf:gq('inf')*R.inf,syr:gq('syr')*R.syr,neb:gq('neb')*R.neb,picc:gq('picc')*R.picc,uvc:gq('uvc')*R.uvc,photo:gq('photo')*R.photo,lp:gq('lp')*R.lp,icd:gq('icd')*R.icd,et:gq('et')*R.et,nsvd:gc('nsvd')*R.nsvd,lscs:gc('lscs')*R.lscs,epis:gq('epis')*R.epis,dnc:gq('dnc')*R.dnc,forceps:gc('forceps')*R.forceps,anc:gq('anc')*R.anc,'ot-minor':gq('ot-minor')*R['ot-minor'],'ot-major':gq('ot-major')*R['ot-major'],'anaes-gen':gq('anaes-gen')*R['anaes-gen'],'anaes-spi':gq('anaes-spi')*R['anaes-spi'],'ot-cons':gq('ot-cons')*R['ot-cons'],surgeon:gq('surgeon')*R.surgeon,misc:gq('misc')}}
-
-function buildSections(v){
-  return[
-    {label:'Registration & Bed',rows:[v.reg?['Registration Fee','1','Rs.200',v.reg]:null,v.nicu?['NICU/PICU Bed',gq('nicu')+' days','Rs.1,500/day',v.nicu]:null,v.ward?['General Ward Bed',gq('ward')+' days','Rs.800/day',v.ward]:null,v.pvt?['Private Cabin',gq('pvt')+' days','Rs.1,500/day',v.pvt]:null,v.doc?["Doctor's Visit",gq('doc')+' days','Rs.400/day',v.doc]:null]},
-    {label:'Respiratory Support',rows:[v.oxy?['Oxygen Therapy',gq('oxy')+' hrs','Rs.60/hr',v.oxy]:null,v.cpap?['CPAP/BiPAP',gq('cpap')+' days','Rs.1,500/day',v.cpap]:null,v.vent?['Ventilator',gq('vent')+' days','Rs.3,000/day',v.vent]:null,v.mon?['Monitor/Pulse Ox',gq('mon')+' hrs','Rs.25/hr',v.mon]:null]},
-    {label:'Consumables & Infusion',rows:[v.cons?['Consumables Pack',gq('cons')+' days','Rs.350/day',v.cons]:null,v.inf?['Infusion Pump',gq('inf')+' days','Rs.200/day',v.inf]:null,v.syr?['Syringe Pump',gq('syr')+' days','Rs.150/day',v.syr]:null,v.neb?['Nebulization',gq('neb')+' sessions','Rs.80/session',v.neb]:null]},
-    {label:'Neonatal & Paediatric Procedures',rows:[v.picc?['PICC Line Insertion',gq('picc'),'Rs.4,000',v.picc]:null,v.uvc?['Umbilical Line (UAC/UVC)',gq('uvc'),'Rs.2,500',v.uvc]:null,v.photo?['Phototherapy',gq('photo')+' days','Rs.500/day',v.photo]:null,v.lp?['Lumbar Puncture',gq('lp'),'Rs.1,500',v.lp]:null,v.icd?['ICD/Chest Drain',gq('icd'),'Rs.3,000',v.icd]:null,v.et?['Intubation/ET Tube',gq('et'),'Rs.800',v.et]:null]},
-    {label:'OBG & Gynaecology',rows:[v.nsvd?['Normal Delivery (NSVD)','1','Rs.5,000',v.nsvd]:null,v.lscs?['C-Section (LSCS)','1','Rs.25,000',v.lscs]:null,v.forceps?['Forceps/Vacuum Delivery','1','Rs.12,000',v.forceps]:null,v.epis?['Episiotomy',gq('epis'),'Rs.1,500',v.epis]:null,v.dnc?['D&C / MTP',gq('dnc'),'Rs.6,000',v.dnc]:null,v.anc?['ANC Consultation',gq('anc')+' visits','Rs.500/visit',v.anc]:null]},
-    {label:'Operation Theatre',rows:[v['ot-minor']?['Minor OT',gq('ot-minor'),'Rs.4,000',v['ot-minor']]:null,v['ot-major']?['Major OT',gq('ot-major'),'Rs.15,000',v['ot-major']]:null,v['anaes-gen']?['Anaesthesia (General)',gq('anaes-gen'),'Rs.5,000',v['anaes-gen']]:null,v['anaes-spi']?['Anaesthesia (Spinal)',gq('anaes-spi'),'Rs.3,000',v['anaes-spi']]:null,v['ot-cons']?['OT Consumables',gq('ot-cons'),'Rs.2,500',v['ot-cons']]:null,v.surgeon?['Surgeon/Specialist Fee',gq('surgeon'),'Rs.8,000',v.surgeon]:null]},
-    {label:'Miscellaneous',rows:[v.misc?[document.getElementById('misc-label')?.value||'Miscellaneous','—','—',v.misc]:null]},
-  ]
+function autoWard() {
+  ["nicu","ward","pvt"].forEach(w => { document.getElementById("q-"+w).value = 0; });
+  recalc();
 }
 
-function fmt(n){return n.toLocaleString('en-IN')}
-
-function recalc(){
-  const v=getVals();
-  Object.keys(v).forEach(k=>{const el=document.getElementById('amt-'+k);if(el)el.textContent=v[k]?'Rs.'+fmt(v[k]):'Rs.0'});
-  Object.keys(v).forEach(k=>{const el=document.getElementById('cc-'+k);if(el)el.classList.toggle('active-charge',v[k]>0)});
-  const disc=parseFloat(document.getElementById('discount').value)||0;
-  const subtotal=Object.values(v).reduce((a,b)=>a+b,0);
-  const discAmt=Math.round(subtotal*disc/100);
-  const total=subtotal-discAmt;
-  const paid=parseInt(document.getElementById('amt-paid').value)||0;
-  const balance=total-paid;
-  document.getElementById('total-display').textContent='Rs.'+fmt(total);
-  document.getElementById('balance-display').textContent=balance>0?'Balance: Rs.'+fmt(balance):'';
-  const sections=buildSections(v);
-  let html='';let hasAny=false;
-  sections.forEach(s=>{const rows=s.rows.filter(Boolean);if(!rows.length)return;hasAny=true;html+='<tr class="bill-section-row"><td colspan="4">'+s.label+'</td></tr>';rows.forEach(r=>html+='<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="text-right text-mono">Rs.'+fmt(r[3])+'</td></tr>')});
-  document.getElementById('bill-tbody').innerHTML=hasAny?html:'<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px">Add charges above to preview bill</td></tr>';
-  if(hasAny){
-    let f='<tr><td colspan="3" style="text-align:right;padding:9px 13px;font-size:.8rem;color:var(--muted)">Subtotal</td><td class="text-right text-mono" style="padding:9px 13px">Rs.'+fmt(subtotal)+'</td></tr>';
-    if(discAmt)f+='<tr><td colspan="3" style="text-align:right;padding:5px 13px;font-size:.8rem;color:var(--red)">Discount ('+disc+'%)</td><td class="text-right text-mono" style="padding:5px 13px;color:var(--red)">-Rs.'+fmt(discAmt)+'</td></tr>';
-    f+='<tr class="bill-total-row"><td colspan="3" style="padding:12px 13px">NET PAYABLE</td><td class="text-right" style="padding:12px 13px;font-family:'JetBrains Mono',monospace;font-size:1.05rem">Rs.'+fmt(total)+'</td></tr>';
-    if(paid>0)f+='<tr><td colspan="3" style="text-align:right;padding:5px 13px;font-size:.8rem;color:var(--green)">Amount Paid</td><td class="text-right text-mono" style="padding:5px 13px;color:var(--green)">Rs.'+fmt(paid)+'</td></tr>';
-    if(balance>0)f+='<tr><td colspan="3" style="text-align:right;padding:5px 13px;font-size:.8rem;color:var(--red);font-weight:700">Balance Due</td><td class="text-right text-mono" style="padding:5px 13px;color:var(--red);font-weight:700">Rs.'+fmt(balance)+'</td></tr>';
-    document.getElementById('bill-tfoot').innerHTML=f;
-  }else document.getElementById('bill-tfoot').innerHTML='';
+function autoFill() {
+  const a = document.getElementById("p-admit").value;
+  const d = document.getElementById("p-discharge").value;
+  if (!a || !d) { toast("Set admission and discharge dates first"); return; }
+  const days = Math.max(1, Math.round((new Date(d) - new Date(a)) / 86400000));
+  const ward = document.getElementById("p-ward").value;
+  if (ward === "nicu" || ward === "picu") document.getElementById("q-nicu").value = days;
+  else if (ward === "ward") document.getElementById("q-ward").value = days;
+  else if (ward === "pvt") document.getElementById("q-pvt").value = days;
+  document.getElementById("q-doc").value = days;
+  document.getElementById("q-cons").value = days;
+  recalc();
+  toast("Auto-filled " + days + " day(s)");
 }
 
-function generateBill(){
-  const name=document.getElementById('p-name').value.trim();
-  if(!name){toast('Enter patient name first');return}
-  const pid=generatePID();
-  const disc=parseFloat(document.getElementById('discount').value)||0;
-  const paid=parseInt(document.getElementById('amt-paid').value)||0;
-  const v=getVals();
-  const qty={nicu:gq('nicu'),ward:gq('ward'),pvt:gq('pvt'),doc:gq('doc'),oxy:gq('oxy'),cpap:gq('cpap'),vent:gq('vent'),mon:gq('mon'),cons:gq('cons'),inf:gq('inf'),syr:gq('syr'),neb:gq('neb'),picc:gq('picc'),uvc:gq('uvc'),photo:gq('photo'),lp:gq('lp'),icd:gq('icd'),et:gq('et'),epis:gq('epis'),dnc:gq('dnc'),anc:gq('anc'),'ot-minor':gq('ot-minor'),'ot-major':gq('ot-major'),'anaes-gen':gq('anaes-gen'),'anaes-spi':gq('anaes-spi'),'ot-cons':gq('ot-cons'),surgeon:gq('surgeon'),misc:gq('misc')};
-  const subtotal=Object.values(v).reduce((a,b)=>a+b,0);
-  const discAmt=Math.round(subtotal*disc/100);
-  const total=subtotal-discAmt;
-  const balance=total-paid;
-  const record={pid,name,age:document.getElementById('p-age').value,gender:document.getElementById('p-gender').value,guardian:document.getElementById('p-guardian').value,contact:document.getElementById('p-contact').value,admit:document.getElementById('p-admit').value,discharge:document.getElementById('p-discharge').value,ward:document.getElementById('p-ward').value,diag:document.getElementById('p-diagnosis').value,doctor:document.getElementById('p-doctor').value,payMode:document.getElementById('pay-mode').value,discReason:document.getElementById('disc-reason').value,miscLabel:document.getElementById('misc-label').value,disc,discAmt,subtotal,total,paid,balance,date:new Date().toLocaleString('en-IN'),vals:v,qty};
-  fbSaveRecord(record);
+// ════════════════════════════════════════════════════════
+// GENERATE BILL
+// ════════════════════════════════════════════════════════
+function generateBill() {
+  const name = document.getElementById("p-name").value.trim();
+  if (!name) { toast("Enter patient name first"); return; }
+
+  const pid  = generatePID();
+  const disc = parseFloat(document.getElementById("discount").value) || 0;
+  const paid = parseInt(document.getElementById("amt-paid").value) || 0;
+  const v    = getVals();
+  const q    = {};
+  ["nicu","ward","pvt","doc","oxy","cpap","vent","mon","cons","inf","syr","neb",
+   "picc","uvc","photo","lp","icd","et","epis","dnc","anc","otm","otM","ag","as","otc","surg","misc"]
+    .forEach(k => q[k] = gq(k));
+
+  const subtotal = Object.values(v).reduce((a, b) => a + b, 0);
+  const discAmt  = Math.round(subtotal * disc / 100);
+  const total    = subtotal - discAmt;
+  const balance  = total - paid;
+
+  const record = {
+    pid, name,
+    age:      document.getElementById("p-age").value,
+    gender:   document.getElementById("p-gender").value,
+    guardian: document.getElementById("p-guardian").value,
+    contact:  document.getElementById("p-contact").value,
+    admit:    document.getElementById("p-admit").value,
+    discharge:document.getElementById("p-discharge").value,
+    ward:     document.getElementById("p-ward").value,
+    diag:     document.getElementById("p-diagnosis").value,
+    doctor:   document.getElementById("p-doctor").value,
+    payMode:  document.getElementById("pay-mode").value,
+    discReason: document.getElementById("disc-rsn").value,
+    miscLabel:  document.getElementById("misc-lbl").value,
+    disc, discAmt, subtotal, total, paid, balance,
+    date: new Date().toLocaleString("en-IN"),
+    vals: v, qty: q
+  };
+
   buildReceipt(record);
-  toast('Bill saved and syncing');
+  fbSave(record);
   clearForm();
 }
 
-function buildReceipt(r){
-  document.getElementById('r-pid').textContent='PID: '+r.pid;
-  document.getElementById('r-paymode').textContent='Payment Mode: '+r.payMode;
-  document.getElementById('r-total').textContent='Rs.'+fmt(r.total);
-  const wl={nicu:'NICU',picu:'PICU',ward:'General Ward',pvt:'Private Cabin',obg:'OBG / Maternity'}[r.ward]||r.ward||'—';
-  document.getElementById('r-info').innerHTML='<div class="receipt-info-item"><label>Patient Name</label><span>'+r.name+'</span></div><div class="receipt-info-item"><label>Patient ID</label><span style="font-family:monospace;color:var(--teal)">'+r.pid+'</span></div><div class="receipt-info-item"><label>Age / Gender</label><span>'+(r.age||'—')+' / '+(r.gender||'—')+'</span></div><div class="receipt-info-item"><label>Guardian</label><span>'+(r.guardian||'—')+'</span></div><div class="receipt-info-item"><label>Ward / Dept</label><span>'+wl+'</span></div><div class="receipt-info-item"><label>Attending Doctor</label><span>'+r.doctor+'</span></div><div class="receipt-info-item"><label>Admission</label><span>'+(r.admit||'—')+'</span></div><div class="receipt-info-item"><label>Discharge</label><span>'+(r.discharge||'—')+'</span></div><div class="receipt-info-item" style="grid-column:1/-1"><label>Diagnosis</label><span>'+(r.diag||'—')+'</span></div><div class="receipt-info-item"><label>Bill Date</label><span>'+r.date+'</span></div>';
-  const v=r.vals,q=r.qty;
-  const sections=[
-    {label:'Registration & Bed',rows:[v.reg?['Registration Fee','1','Rs.200',v.reg]:null,v.nicu?['NICU/PICU Bed',(q.nicu||0)+' days','Rs.1,500/day',v.nicu]:null,v.ward?['General Ward Bed',(q.ward||0)+' days','Rs.800/day',v.ward]:null,v.pvt?['Private Cabin',(q.pvt||0)+' days','Rs.1,500/day',v.pvt]:null,v.doc?["Doctor's Visit",(q.doc||0)+' days','Rs.400/day',v.doc]:null]},
-    {label:'Respiratory Support',rows:[v.oxy?['Oxygen Therapy',(q.oxy||0)+' hrs','Rs.60/hr',v.oxy]:null,v.cpap?['CPAP/BiPAP',(q.cpap||0)+' days','Rs.1,500/day',v.cpap]:null,v.vent?['Ventilator',(q.vent||0)+' days','Rs.3,000/day',v.vent]:null,v.mon?['Monitor/Pulse Ox',(q.mon||0)+' hrs','Rs.25/hr',v.mon]:null]},
-    {label:'Consumables & Infusion',rows:[v.cons?['Consumables Pack',(q.cons||0)+' days','Rs.350/day',v.cons]:null,v.inf?['Infusion Pump',(q.inf||0)+' days','Rs.200/day',v.inf]:null,v.syr?['Syringe Pump',(q.syr||0)+' days','Rs.150/day',v.syr]:null,v.neb?['Nebulization',(q.neb||0)+' sessions','Rs.80/session',v.neb]:null]},
-    {label:'Neonatal & Paediatric Procedures',rows:[v.picc?['PICC Line Insertion',q.picc||0,'Rs.4,000',v.picc]:null,v.uvc?['Umbilical Line (UAC/UVC)',q.uvc||0,'Rs.2,500',v.uvc]:null,v.photo?['Phototherapy',(q.photo||0)+' days','Rs.500/day',v.photo]:null,v.lp?['Lumbar Puncture',q.lp||0,'Rs.1,500',v.lp]:null,v.icd?['ICD/Chest Drain',q.icd||0,'Rs.3,000',v.icd]:null,v.et?['Intubation/ET Tube',q.et||0,'Rs.800',v.et]:null]},
-    {label:'OBG & Gynaecology',rows:[v.nsvd?['Normal Delivery (NSVD)','1','Rs.5,000',v.nsvd]:null,v.lscs?['C-Section (LSCS)','1','Rs.25,000',v.lscs]:null,v.forceps?['Forceps/Vacuum Delivery','1','Rs.12,000',v.forceps]:null,v.epis?['Episiotomy',q.epis||0,'Rs.1,500',v.epis]:null,v.dnc?['D&C / MTP',q.dnc||0,'Rs.6,000',v.dnc]:null,v.anc?['ANC Consultation',(q.anc||0)+' visits','Rs.500/visit',v.anc]:null]},
-    {label:'Operation Theatre',rows:[v['ot-minor']?['Minor OT',q['ot-minor']||0,'Rs.4,000',v['ot-minor']]:null,v['ot-major']?['Major OT',q['ot-major']||0,'Rs.15,000',v['ot-major']]:null,v['anaes-gen']?['Anaesthesia (General)',q['anaes-gen']||0,'Rs.5,000',v['anaes-gen']]:null,v['anaes-spi']?['Anaesthesia (Spinal)',q['anaes-spi']||0,'Rs.3,000',v['anaes-spi']]:null,v['ot-cons']?['OT Consumables',q['ot-cons']||0,'Rs.2,500',v['ot-cons']]:null,v.surgeon?['Surgeon/Specialist Fee',q.surgeon||0,'Rs.8,000',v.surgeon]:null]},
-    {label:'Miscellaneous',rows:[v.misc?[r.miscLabel||'Miscellaneous','—','—',v.misc]:null]},
-  ];
-  let html='';
-  sections.forEach(s=>{const rows=s.rows.filter(Boolean);if(!rows.length)return;html+='<tr class="bill-section-row"><td colspan="4">'+s.label+'</td></tr>';rows.forEach(row=>html+='<tr><td>'+row[0]+'</td><td>'+row[1]+'</td><td>'+row[2]+'</td><td class="text-right">Rs.'+fmt(row[3])+'</td></tr>')});
-  if(r.discAmt)html+='<tr><td colspan="3" style="text-align:right;color:var(--red);font-size:.8rem">Discount ('+r.disc+'%)'+(r.discReason?' — '+r.discReason:'')+'</td><td class="text-right" style="color:var(--red)">-Rs.'+fmt(r.discAmt)+'</td></tr>';
-  document.getElementById('r-tbody').innerHTML=html;
-  const bb=document.getElementById('r-balance-box');
-  if(r.balance>0){document.getElementById('r-balance').textContent='Rs.'+fmt(r.balance);bb.style.display='flex'}else bb.style.display='none';
-  document.getElementById('receipt-card').classList.add('show');
-  document.getElementById('print-btn-row').style.display='flex';
-  document.getElementById('receipt-card').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function hideReceipt(){document.getElementById('receipt-card').classList.remove('show');document.getElementById('print-btn-row').style.display='none'}
+// ════════════════════════════════════════════════════════
+// RECEIPT
+// ════════════════════════════════════════════════════════
+function buildReceipt(r) {
+  document.getElementById("r-pid").textContent = "PID: " + r.pid;
+  document.getElementById("r-paymode").textContent = "Payment: " + r.payMode;
+  document.getElementById("r-total").textContent = "₹" + fmt(r.total);
 
-function renderPatientTable(){
-  const q=(document.getElementById('search-box')?.value||'').toLowerCase();
-  const f=patients.filter(p=>p.name.toLowerCase().includes(q)||p.pid.toLowerCase().includes(q));
-  const wb={nicu:'badge-nicu',picu:'badge-icu',ward:'badge-ward',pvt:'badge-pvt',obg:'badge-obg'};
-  const wl={nicu:'NICU',picu:'PICU',ward:'Ward',pvt:'Pvt',obg:'OBG'};
-  const tb=document.getElementById('patient-tbody');
-  if(!f.length){tb.innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:22px">No records found.</td></tr>';return}
-  tb.innerHTML=f.map((p)=>{
-    const idx=patients.indexOf(p);
-    return `<tr><td class="text-mono" style="font-size:.77rem;color:var(--teal)">${p.pid}</td><td><strong>${p.name}</strong><br><span style="font-size:.71rem;color:var(--muted)">${p.contact||''}</span></td><td>${p.age||'—'}/${p.gender?p.gender[0]:'—'}</td><td><span class="badge ${wb[p.ward]||'badge-ward'}">${wl[p.ward]||p.ward||'—'}</span></td><td style="font-size:.8rem">${p.admit||'—'}</td><td style="font-size:.78rem">${p.diag||'—'}</td><td class="text-mono" style="color:var(--navy);font-weight:700">Rs.${fmt(p.total)}</td><td class="text-mono" style="color:var(--green)">Rs.${fmt(p.paid||0)}</td><td class="text-mono" style="color:${p.balance>0?'var(--red)":'var(--green)'}">Rs.${fmt(p.balance||0)}</td><td><button class="btn btn-teal btn-sm" onclick="viewBill(${idx})">Receipt</button> <button class="btn btn-danger btn-sm" style="margin-left:3px" data-pid="${p.pid}" onclick="deletePatient(this.dataset.pid)">✕</button></td></tr>`;
-  }).join('');
+  const wl = { nicu:"NICU", picu:"PICU", ward:"General Ward", pvt:"Private Cabin", obg:"OBG / Maternity" };
+  document.getElementById("r-info").innerHTML = `
+    <div class="ri"><label>Patient Name</label><span>${r.name}</span></div>
+    <div class="ri"><label>Patient ID</label><span style="font-family:monospace;color:var(--teal)">${r.pid}</span></div>
+    <div class="ri"><label>Age / Gender</label><span>${r.age||"—"} / ${r.gender||"—"}</span></div>
+    <div class="ri"><label>Guardian</label><span>${r.guardian||"—"}</span></div>
+    <div class="ri"><label>Ward / Dept</label><span>${wl[r.ward]||r.ward||"—"}</span></div>
+    <div class="ri"><label>Doctor</label><span>${r.doctor}</span></div>
+    <div class="ri"><label>Admission</label><span>${r.admit||"—"}</span></div>
+    <div class="ri"><label>Discharge</label><span>${r.discharge||"—"}</span></div>
+    <div class="ri" style="grid-column:1/-1"><label>Diagnosis</label><span>${r.diag||"—"}</span></div>
+    <div class="ri"><label>Bill Date</label><span>${r.date}</span></div>`;
+
+  let html = buildRows(r.vals, r.qty);
+  if (r.discAmt) html += `<tr><td colspan="3" style="text-align:right;color:var(--red);font-size:.78rem">Discount (${r.disc}%)${r.discReason?" — "+r.discReason:""}</td><td class="tr" style="color:var(--red)">−₹${fmt(r.discAmt)}</td></tr>`;
+  document.getElementById("r-body").innerHTML = html;
+
+  const bb = document.getElementById("r-bal-box");
+  if (r.balance > 0) { document.getElementById("r-bal").textContent = "₹" + fmt(r.balance); bb.style.display = "flex"; }
+  else bb.style.display = "none";
+
+  document.getElementById("receipt-card").classList.add("show");
+  document.getElementById("print-row").style.display = "flex";
+  document.getElementById("receipt-card").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function viewBill(i){buildReceipt(patients[i]);document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-new-bill').classList.add('active');document.querySelectorAll('.tab-btn')[0].classList.add('active')}
-
-function deletePatient(pid){
-  if(!confirm('Delete this patient record?'))return;
-  fbDeleteRecord(pid);toast('Record deleted');
+function hideReceipt() {
+  document.getElementById("receipt-card").classList.remove("show");
+  document.getElementById("print-row").style.display = "none";
 }
 
-function updateStats(){
-  document.getElementById('stat-total').textContent=patients.length;
-  document.getElementById('stat-bills').textContent=billCount;
-  const avg=patients.length?Math.round(totalRevenue/patients.length):0;
-  document.getElementById('stat-revenue').textContent='Rs.'+fmt(avg);
-  document.getElementById('stat-pending').textContent=patients.filter(p=>p.balance>0).length;
-  document.getElementById('pid-display').textContent=generatePID();
+// ════════════════════════════════════════════════════════
+// TABLES
+// ════════════════════════════════════════════════════════
+const WB = { nicu:"b-nicu", picu:"b-icu", ward:"b-ward", pvt:"b-pvt", obg:"b-obg" };
+const WL = { nicu:"NICU", picu:"PICU", ward:"Ward", pvt:"Pvt", obg:"OBG" };
+
+function renderTable() {
+  const q   = (document.getElementById("search-box")?.value || "").toLowerCase();
+  const pts = visiblePatients().filter(p =>
+    p.name.toLowerCase().includes(q) || p.pid.toLowerCase().includes(q));
+  const tb = document.getElementById("pt-body");
+  if (!pts.length) { tb.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:20px">No records found.</td></tr>`; return; }
+  tb.innerHTML = pts.map((p, i) => {
+    const idx = allPatients.indexOf(p);
+    return `<tr>
+      <td class="mono" style="font-size:.74rem;color:var(--teal)">${p.pid}</td>
+      <td><strong>${p.name}</strong><br><span style="font-size:.7rem;color:var(--muted)">${p.contact||""}</span></td>
+      <td>${p.age||"—"}/${p.gender?p.gender[0]:"—"}</td>
+      <td><span class="badge ${WB[p.ward]||"b-ward"}">${WL[p.ward]||p.ward||"—"}</span></td>
+      <td style="font-size:.78rem">${p.admit||"—"}</td>
+      <td style="font-size:.76rem">${p.diag||"—"}</td>
+      <td class="mono" style="font-weight:700">₹${fmt(p.total)}</td>
+      <td class="mono" style="color:var(--green)">₹${fmt(p.paid||0)}</td>
+      <td class="mono" style="color:${p.balance>0?"var(--red)":"var(--green)"}">₹${fmt(p.balance||0)}</td>
+      <td><button class="btn btn-teal btn-sm" onclick="viewBill(${idx})">🧾</button></td>
+    </tr>`;
+  }).join("");
 }
 
-function clearForm(){
-  ['p-name','p-age','p-guardian','p-contact','p-discharge','p-diagnosis','disc-reason','misc-label'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
-  document.getElementById('p-gender').value='';document.getElementById('p-ward').value='';
-  document.getElementById('p-doctor').value='Dr. Ritik Chandra';
-  document.getElementById('p-admit').value=new Date().toISOString().split('T')[0];
-  ['nicu','ward','pvt','doc','oxy','cpap','vent','mon','cons','inf','syr','neb','picc','uvc','photo','lp','icd','et','epis','dnc','anc','ot-minor','ot-major','anaes-gen','anaes-spi','ot-cons','surgeon','misc'].forEach(k=>{const el=document.getElementById('qty-'+k);if(el){el.value=0;el.disabled=false}});
-  document.getElementById('chk-reg').checked=true;
-  ['nsvd','lscs','forceps'].forEach(id=>document.getElementById('chk-'+id).checked=false);
-  document.getElementById('discount').value=0;document.getElementById('amt-paid').value=0;document.getElementById('pay-mode').value='Cash';
-  document.getElementById('cc-oxy').classList.remove('disabled-charge');
-  document.getElementById('vent-warning').classList.remove('show');
-  recalc();hideReceipt();document.getElementById('pid-display').textContent=generatePID();
-}
-
-function clearAll(){
-  if(!confirm('Clear ALL patient records? This cannot be undone.'))return;
-  fbClearAll();toast('All records cleared');
-}
-
-function exportCSV(){
-  if(!patients.length){toast('No records to export');return}
-  const h=['Patient ID','Name','Age','Gender','Guardian','Contact','Ward','Admission','Discharge','Diagnosis','Doctor','Subtotal','Discount','Total','Paid','Balance','Payment Mode','Date'];
-  const rows=patients.map(p=>[p.pid,p.name,p.age,p.gender,p.guardian,p.contact,p.ward,p.admit,p.discharge,p.diag,p.doctor,p.subtotal,p.discAmt,p.total,p.paid||0,p.balance||0,p.payMode,p.date]);
-  const csv=[h,...rows].map(r=>r.map(c=>'"'+(c||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='CHW_Patients_'+new Date().toISOString().split('T')[0]+'.csv';a.click();toast('CSV exported');
-}
-
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
-
-document.addEventListener('keydown',function(e){
-  if(e.key!=='Enter')return;
-  const tag=e.target.tagName;
-  if(tag==='TEXTAREA'||e.target.type==='checkbox')return;
-  e.preventDefault();
-  const focusable='input:not([disabled]):not([readonly]), select, textarea, button.btn-primary';
-  const els=Array.from(document.querySelectorAll(focusable)).filter(el=>{
-    const s=window.getComputedStyle(el);
-    return s.display!=='none'&&s.visibility!=='hidden'&&el.offsetParent!==null;
+function renderAdminTable() {
+  if (currentRole !== "admin") return;
+  const q  = (document.getElementById("a-search")?.value || "").toLowerCase();
+  const fw = document.getElementById("a-filter-ward")?.value || "";
+  let pts  = allPatients.filter(p => {
+    const mq = p.name.toLowerCase().includes(q) || p.pid.toLowerCase().includes(q);
+    const mw = !fw || p.ward === fw;
+    return mq && mw;
   });
-  const idx=els.indexOf(e.target);
-  if(idx>-1&&idx<els.length-1)els[idx+1].focus();
+  const tb = document.getElementById("admin-body");
+  if (!pts.length) { tb.innerHTML = `<tr><td colspan="12" style="text-align:center;color:var(--muted);padding:20px">No records found.</td></tr>`; return; }
+  tb.innerHTML = pts.map((p, i) => {
+    const idx = allPatients.indexOf(p);
+    return `<tr>
+      <td class="mono" style="font-size:.72rem;color:var(--teal)">${p.pid}</td>
+      <td><strong>${p.name}</strong></td>
+      <td>${p.age||"—"}/${p.gender?p.gender[0]:"—"}</td>
+      <td><span class="badge ${WB[p.ward]||"b-ward"}">${WL[p.ward]||p.ward||"—"}</span></td>
+      <td style="font-size:.76rem">${p.admit||"—"}</td>
+      <td style="font-size:.76rem">${p.discharge||"—"}</td>
+      <td style="font-size:.76rem">${p.diag||"—"}</td>
+      <td class="mono" style="font-weight:700;color:var(--navy)">₹${fmt(p.total)}</td>
+      <td class="mono" style="color:var(--green)">₹${fmt(p.paid||0)}</td>
+      <td class="mono" style="color:${p.balance>0?"var(--red)":"var(--green)"}">₹${fmt(p.balance||0)}</td>
+      <td style="font-size:.76rem">${p.payMode||"—"}</td>
+      <td>
+        <button class="btn btn-teal btn-sm" onclick="viewBill(${idx})">🧾</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:3px" onclick="adminDelete('${p.pid}')">✕</button>
+      </td>
+    </tr>`;
+  }).join("");
+
+  // Admin stats
+  const tot = allPatients.reduce((s,p)=>s+(p.total||0),0);
+  const col = allPatients.reduce((s,p)=>s+(p.paid||0),0);
+  const out = allPatients.reduce((s,p)=>s+(p.balance||0),0);
+  document.getElementById("a-stat-total").textContent = allPatients.length;
+  document.getElementById("a-stat-billed").textContent = "₹"+fmt(tot);
+  document.getElementById("a-stat-collected").textContent = "₹"+fmt(col);
+  document.getElementById("a-stat-out").textContent = "₹"+fmt(out);
+  document.getElementById("a-total-rev").textContent = "Total Revenue: ₹"+fmt(tot);
+}
+
+function viewBill(idx) {
+  buildReceipt(allPatients[idx]);
+  switchTab("new-bill", document.querySelectorAll(".tab")[0]);
+}
+
+function adminDelete(pid) {
+  if (!confirm("Delete patient record " + pid + "?")) return;
+  fbDelete(pid);
+}
+
+function adminClearAll() {
+  if (!confirm("Delete ALL patient records? This cannot be undone.")) return;
+  fbClear();
+}
+
+// ════════════════════════════════════════════════════════
+// STATS
+// ════════════════════════════════════════════════════════
+function updateStats() {
+  const pts = visiblePatients();
+  const total = pts.reduce((s,p)=>s+(p.total||0),0);
+  const avg   = pts.length ? Math.round(total / pts.length) : 0;
+  document.getElementById("s-total").textContent = pts.length;
+  document.getElementById("s-bills").textContent = pts.length;
+  document.getElementById("s-avg").textContent   = "₹"+fmt(avg);
+  document.getElementById("s-pending").textContent = pts.filter(p=>p.balance>0).length;
+  document.getElementById("s-period").textContent =
+    currentRole === "reception" ? "(Last 7 days)" : "(All time)";
+  document.getElementById("pid-display").textContent = generatePID();
+}
+
+// ════════════════════════════════════════════════════════
+// CLEAR FORM
+// ════════════════════════════════════════════════════════
+function clearForm() {
+  ["p-name","p-age","p-guardian","p-contact","p-discharge","p-diagnosis","disc-rsn","misc-lbl"]
+    .forEach(id => { const e = document.getElementById(id); if (e) e.value = ""; });
+  document.getElementById("p-gender").value = "";
+  document.getElementById("p-ward").value = "";
+  document.getElementById("p-doctor").value = "Dr. Ritik Chandra";
+  document.getElementById("p-admit").value = todayStr();
+  ["nicu","ward","pvt","doc","oxy","cpap","vent","mon","cons","inf","syr","neb",
+   "picc","uvc","photo","lp","icd","et","epis","dnc","anc","otm","otM","ag","as","otc","surg","misc"]
+    .forEach(k => { const e = document.getElementById("q-"+k); if (e) { e.value=0; e.disabled=false; } });
+  document.getElementById("chk-reg").checked = true;
+  ["nsvd","lscs","forceps"].forEach(id => document.getElementById("chk-"+id).checked = false);
+  document.getElementById("discount").value = 0;
+  document.getElementById("amt-paid").value = 0;
+  document.getElementById("pay-mode").value = "Cash";
+  document.getElementById("cc-oxy").classList.remove("disabled");
+  document.getElementById("vw").classList.remove("show");
+  hideReceipt();
+  recalc();
+}
+
+// ════════════════════════════════════════════════════════
+// EXPORT CSV
+// ════════════════════════════════════════════════════════
+function exportCSV() {
+  const pts = visiblePatients();
+  if (!pts.length) { toast("No records to export"); return; }
+  const h = ["PID","Name","Age","Gender","Guardian","Contact","Ward","Admission","Discharge","Diagnosis","Doctor","Subtotal","Discount","Total","Paid","Balance","Payment","Date"];
+  const rows = pts.map(p => [p.pid,p.name,p.age,p.gender,p.guardian,p.contact,p.ward,p.admit,p.discharge,p.diag,p.doctor,p.subtotal,p.discAmt,p.total,p.paid||0,p.balance||0,p.payMode,p.date]);
+  const csv = [h,...rows].map(r=>r.map(c=>'"'+(c||"").toString().replace(/"/g,"\"\"")+ '"').join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = "CHW_Patients_" + todayStr() + ".csv";
+  a.click();
+  toast("CSV exported");
+}
+
+function exportAdminCSV() {
+  const tmp = allPatients;
+  const pts = tmp;
+  if (!pts.length) { toast("No records"); return; }
+  const h = ["PID","Name","Age","Gender","Guardian","Contact","Ward","Admission","Discharge","Diagnosis","Doctor","Subtotal","Discount","Total","Paid","Balance","Payment","Date"];
+  const rows = pts.map(p => [p.pid,p.name,p.age,p.gender,p.guardian,p.contact,p.ward,p.admit,p.discharge,p.diag,p.doctor,p.subtotal,p.discAmt,p.total,p.paid||0,p.balance||0,p.payMode,p.date]);
+  const csv = [h,...rows].map(r=>r.map(c=>'"'+(c||"").toString().replace(/"/g,"\"\"")+ '"').join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = "CHW_ALL_Patients_" + todayStr() + ".csv";
+  a.click();
+  toast("Full CSV exported");
+}
+
+// ════════════════════════════════════════════════════════
+// TABS / UI
+// ════════════════════════════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + id).classList.add("active");
+  if (btn) btn.classList.add("active");
+  if (id === "admin") renderAdminTable();
+}
+
+// ════════════════════════════════════════════════════════
+// CLOCK
+// ════════════════════════════════════════════════════════
+function updateClock() {
+  document.getElementById("clock").textContent = new Date().toLocaleString("en-IN", {
+    day:"2-digit", month:"short", year:"numeric",
+    hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:true
+  });
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+// ════════════════════════════════════════════════════════
+// ENTER KEY NAVIGATION
+// ════════════════════════════════════════════════════════
+document.addEventListener("keydown", function(e) {
+  if (e.key !== "Enter") return;
+  if (e.target.type === "checkbox") return;
+  e.preventDefault();
+  const all = Array.from(document.querySelectorAll("input:not([disabled]), select")).filter(el => {
+    const s = window.getComputedStyle(el);
+    return s.display !== "none" && s.visibility !== "hidden" && el.offsetParent !== null;
+  });
+  const idx = all.indexOf(e.target);
+  if (idx > -1 && idx < all.length - 1) all[idx + 1].focus();
 });
+
+// ════════════════════════════════════════════════════════
+// START
+// ════════════════════════════════════════════════════════
+checkSession();
 </script>
 </body>
 </html>
