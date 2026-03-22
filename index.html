@@ -581,6 +581,7 @@ function bootApp() {
   document.getElementById("week-notice").textContent =
     currentRole === "reception" ? "(Showing last 7 days)" : "";
   updateStats(); renderTable();
+  if (pollTimer) clearInterval(pollTimer);
   loadFromFirebase();
   pollTimer = setInterval(loadFromFirebase, 8000);
 }
@@ -605,6 +606,7 @@ async function fbReq(path, method, body) {
 }
 
 async function loadFromFirebase() {
+  if (!currentRole) return;
   try {
     const data = await fbReq("/chw/patients", "GET");
     allPatients = data
@@ -660,8 +662,8 @@ function generatePID() {
   const d = new Date(), yy = String(d.getFullYear()).slice(-2),
     mm = String(d.getMonth() + 1).padStart(2, "0"),
     dd = String(d.getDate()).padStart(2, "0"),
-    seq = String(allPatients.length + 1).padStart(4, "0");
-  return "CHW-" + yy + mm + dd + "-" + seq;
+    uid = Date.now().toString(36).slice(-4).toUpperCase();
+  return "CHW-" + yy + mm + dd + "-" + uid;
 }
 function visiblePatients() {
   if (currentRole === "admin") return allPatients;
@@ -706,7 +708,7 @@ function getVals() {
   };
 }
 
-function buildRows(v, q) {
+function buildRows(v, q, miscLabel) {
   const s = [
     { lbl: "Registration & Bed", rows: [
         v.reg    && ["Registration Fee", "1", "₹200", v.reg],
@@ -752,18 +754,11 @@ function buildRows(v, q) {
         v.surg && ["Surgeon/Specialist Fee", q.surg||0, "₹8,000", v.surg]
     ]},
     { lbl: "Miscellaneous", rows: [
-        v.misc && [document.getElementById("misc-lbl")?.value || "Miscellaneous", "—", "—", v.misc]
+        v.misc && [miscLabel || "Miscellaneous", "—", "—", v.misc]
     ]}
   ];
-  // custom lines (from edited bills)
-  if (q && q._customLines) {
-    q._customLines.forEach(cl => {
-      if (cl.amt > 0) {
-        html += `<tr><td>${cl.name}</td><td>${cl.qty}</td><td>₹${fmt(cl.rate)}</td><td class="tr mono">₹${fmt(cl.amt)}</td></tr>`;
-      }
-    });
-  }
   let html = "";
+  let hasAny = false;
   s.forEach(sec => {
     const rows = sec.rows.filter(Boolean);
     if (!rows.length) return;
@@ -773,7 +768,16 @@ function buildRows(v, q) {
       html += `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="tr mono">₹${fmt(r[3])}</td></tr>`;
     });
   });
-  return hasAny ? html : '';
+  // custom lines from admin-edited bills (appended after sections)
+  if (q && q._customLines) {
+    q._customLines.forEach(cl => {
+      if (cl.amt > 0) {
+        hasAny = true;
+        html += `<tr><td>${cl.name}</td><td>${cl.qty}</td><td>₹${fmt(cl.rate)}</td><td class="tr mono">₹${fmt(cl.amt)}</td></tr>`;
+      }
+    });
+  }
+  return hasAny ? html : "";
 }
 
 function recalc() {
@@ -802,7 +806,7 @@ function recalc() {
    "picc","uvc","photo","lp","icd","et","epis","dnc","anc","otm","otM","ag","as","otc","surg","misc"]
     .forEach(k => q[k] = gq(k));
 
-  const rows = buildRows(v, q);
+  const rows = buildRows(v, q, document.getElementById("misc-lbl")?.value);
   const body = document.getElementById("bill-body");
   const foot = document.getElementById("bill-foot");
   if (!rows) {
@@ -898,9 +902,9 @@ function generateBill() {
     vals: v, qty: q
   };
 
+  clearForm();
   buildReceipt(record);
   fbSave(record);
-  clearForm();
 }
 
 // ════════════════════════════════════════════════════════
@@ -925,7 +929,7 @@ function buildReceipt(r) {
     <div class="ri"><label>Bill Date</label><span>${r.date}</span></div>`;
 
   const qWithCustom = { ...(r.qty||{}), _customLines: r.customLines||[] };
-  let html = buildRows(r.vals, qWithCustom);
+  let html = buildRows(r.vals, qWithCustom, r.miscLabel);
   if (r.discAmt) html += `<tr><td colspan="3" style="text-align:right;color:var(--red);font-size:.78rem">Discount (${r.disc}%)${r.discReason?" — "+r.discReason:""}</td><td class="tr" style="color:var(--red)">−₹${fmt(r.discAmt)}</td></tr>`;
   if (r.advance > 0) html += `<tr><td colspan="3" style="text-align:right;color:var(--green);font-size:.78rem">Advance Paid${r.advNote?" ("+r.advNote+")":""}</td><td class="tr" style="color:var(--green)">−₹${fmt(r.advance)}</td></tr>`;
   if (r.paid > 0) html += `<tr><td colspan="3" style="text-align:right;color:var(--green);font-size:.78rem">Paid Now</td><td class="tr" style="color:var(--green)">−₹${fmt(r.paid)}</td></tr>`;
@@ -967,9 +971,9 @@ function renderTable() {
       <td style="font-size:.78rem">${p.admit||"—"}</td>
       <td style="font-size:.76rem">${p.diag||"—"}</td>
       <td class="mono" style="font-weight:700">₹${fmt(p.total)}</td>
-      <td class="mono" style="color:var(--green)">₹${fmt(p.paid||0)}</td>
+      <td class="mono" style="color:var(--green)">₹${fmt(p.totalPaid||p.paid||0)}</td>
       <td class="mono" style="color:${p.balance>0?"var(--red)":"var(--green)"}">₹${fmt(p.balance||0)}</td>
-      <td><button class="btn btn-teal btn-sm" onclick="viewBill(${idx})">🧾</button></td>
+      <td><button class="btn btn-teal btn-sm" onclick="viewBillByPid('${p.pid}')">🧾</button></td>
     </tr>`;
   }).join("");
 }
@@ -996,11 +1000,11 @@ function renderAdminTable() {
       <td style="font-size:.76rem">${p.discharge||"—"}</td>
       <td style="font-size:.76rem">${p.diag||"—"}</td>
       <td class="mono" style="font-weight:700;color:var(--navy)">₹${fmt(p.total)}</td>
-      <td class="mono" style="color:var(--green)">₹${fmt(p.paid||0)}</td>
+      <td class="mono" style="color:var(--green)">₹${fmt(p.totalPaid||p.paid||0)}</td>
       <td class="mono" style="color:${p.balance>0?"var(--red)":"var(--green)"}">₹${fmt(p.balance||0)}</td>
       <td style="font-size:.76rem">${p.payMode||"—"}</td>
       <td>
-        <button class="btn btn-teal btn-sm" onclick="viewBill(${idx})">🧾</button>
+        <button class="btn btn-teal btn-sm" onclick="viewBillByPid('${p.pid}')">🧾</button>
         <button class="btn btn-outline btn-sm" style="margin-left:3px" onclick="openEditModal('${p.pid}')">✏️</button>
         <button class="btn btn-danger btn-sm" style="margin-left:3px" onclick="adminDelete('${p.pid}')">✕</button>
       </td>
@@ -1009,7 +1013,7 @@ function renderAdminTable() {
 
   // Admin stats
   const tot = allPatients.reduce((s,p)=>s+(p.total||0),0);
-  const col = allPatients.reduce((s,p)=>s+(p.paid||0),0);
+  const col = allPatients.reduce((s,p)=>s+(p.totalPaid||p.paid||0),0);
   const out = allPatients.reduce((s,p)=>s+(p.balance||0),0);
   document.getElementById("a-stat-total").textContent = allPatients.length;
   document.getElementById("a-stat-billed").textContent = "₹"+fmt(tot);
@@ -1021,6 +1025,10 @@ function renderAdminTable() {
 function viewBill(idx) {
   buildReceipt(allPatients[idx]);
   switchTab("new-bill", document.querySelectorAll(".tab")[0]);
+}
+function viewBillByPid(pid) {
+  const p = allPatients.find(x => x.pid === pid);
+  if (p) { buildReceipt(p); switchTab("new-bill", document.querySelectorAll(".tab")[0]); }
 }
 
 function adminDelete(pid) {
@@ -1081,8 +1089,8 @@ function clearForm() {
 function exportCSV() {
   const pts = visiblePatients();
   if (!pts.length) { toast("No records to export"); return; }
-  const h = ["PID","Name","Age","Gender","Guardian","Contact","Ward","Admission","Discharge","Diagnosis","Doctor","Subtotal","Discount","Total","Paid","Balance","Payment","Date"];
-  const rows = pts.map(p => [p.pid,p.name,p.age,p.gender,p.guardian,p.contact,p.ward,p.admit,p.discharge,p.diag,p.doctor,p.subtotal,p.discAmt,p.total,p.paid||0,p.balance||0,p.payMode,p.date]);
+  const h = ["PID","Name","Age","Gender","Guardian","Contact","Ward","Admission","Discharge","Diagnosis","Doctor","Subtotal","Discount","Total","Advance","Paid Now","Total Paid","Balance","Payment","Date"];
+  const rows = pts.map(p => [p.pid,p.name,p.age,p.gender,p.guardian,p.contact,p.ward,p.admit,p.discharge,p.diag,p.doctor,p.subtotal,p.discAmt,p.total,p.advance||0,p.paid||0,p.totalPaid||0,p.balance||0,p.payMode,p.date]);
   const csv = [h,...rows].map(r => r.map(c => `"${(c||"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
@@ -1095,8 +1103,8 @@ function exportAdminCSV() {
   const tmp = allPatients;
   const pts = tmp;
   if (!pts.length) { toast("No records"); return; }
-  const h = ["PID","Name","Age","Gender","Guardian","Contact","Ward","Admission","Discharge","Diagnosis","Doctor","Subtotal","Discount","Total","Paid","Balance","Payment","Date"];
-  const rows = pts.map(p => [p.pid,p.name,p.age,p.gender,p.guardian,p.contact,p.ward,p.admit,p.discharge,p.diag,p.doctor,p.subtotal,p.discAmt,p.total,p.paid||0,p.balance||0,p.payMode,p.date]);
+  const h = ["PID","Name","Age","Gender","Guardian","Contact","Ward","Admission","Discharge","Diagnosis","Doctor","Subtotal","Discount","Total","Advance","Paid Now","Total Paid","Balance","Payment","Date"];
+  const rows = pts.map(p => [p.pid,p.name,p.age,p.gender,p.guardian,p.contact,p.ward,p.admit,p.discharge,p.diag,p.doctor,p.subtotal,p.discAmt,p.total,p.advance||0,p.paid||0,p.totalPaid||0,p.balance||0,p.payMode,p.date]);
   const csv = [h,...rows].map(r => r.map(c => `"${(c||"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
@@ -1197,6 +1205,7 @@ function openEditModal(pid) {
     ["as","Anaesthesia (Spinal)",3000,"proc",false],
     ["otc","OT Consumables",2500,"proc",false],
     ["surg","Surgeon/Specialist Fee",8000,"proc",false],
+    ["misc","Miscellaneous / Other",1,"₹ amount",false],
   ];
 
   const v = p.vals || {};
@@ -1205,7 +1214,7 @@ function openEditModal(pid) {
   let rows = CHARGE_DEFS.map(([key, lbl, rate, unit, isChk]) => {
     const val = v[key] || 0;
     const qty = isChk ? (val > 0 ? 1 : 0) : (q[key] || 0);
-    if (!val && !qty) return "";  // skip zero items in edit view — but show them
+    
     const inputHtml = isChk
       ? `<input type="checkbox" id="ec-${key}" ${val>0?"checked":""} onchange="editRecalc()" style="width:auto">`
       : `<input type="number" id="ec-${key}" value="${qty}" min="0" class="cqty" style="width:70px" oninput="editRecalc()">`;
@@ -1366,7 +1375,7 @@ async function saveEditedBill() {
     subtotal  += amt;
     customLines.push({ name, qty, rate, amt });
   });
-  newVals.misc = customLines.reduce((s,c) => s+c.amt, 0);
+  // misc handled by ec-misc standard row above
 
   const disc     = parseFloat(document.getElementById("e-disc")?.value)||0;
   const discReason = document.getElementById("e-disc-rsn")?.value||"";
